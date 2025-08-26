@@ -1,7 +1,7 @@
 {
   "name": "odin-inventory-app",
   "version": "1.0.0",
-  "description": "Initialize Postgres in the current directory: ``` make initpostgres ```",
+  "description": "",
   "main": "app.ts",
   "scripts": {
     "dev": "npx tsx --env-file=.env --watch src/app.ts"
