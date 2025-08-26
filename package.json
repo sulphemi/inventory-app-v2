@@ -2,9 +2,9 @@
   "name": "odin-inventory-app",
   "version": "1.0.0",
   "description": "Initialize Postgres in the current directory: ``` make initpostgres ```",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx tsx --env-file=.env --watch src/app.ts"
   },
   "author": "",
   "license": "ISC",
