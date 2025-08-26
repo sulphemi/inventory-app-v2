@@ -1,4 +1,21 @@
-# Setting up Postgres
+# Getting started
+
+## Dependencies
+
+Need to install:
+- nodejs
+- postgresql
+
+Alternatively, there is a nix shell that can be used
+
+After installing nodejs, install the npm packages:
+```
+npm install
+```
+
+
+## Setting up Postgres
+
 Initialize Postgres in the current directory:
 ```
 make initpostgres
@@ -33,7 +50,8 @@ psql -h $PWD -U $USER -d keyboard_inventory -f data.sql
 ```
 
 
-# Starting and stopping Postgres
+## Starting and stopping Postgres
+
 Start the server with:
 ```
 
