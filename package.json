@@ -2,7 +2,7 @@
   "name": "odin-inventory-app",
   "version": "1.0.0",
   "description": "",
-  "main": "app.ts",
+  "main": "src/app.ts",
   "scripts": {
     "dev": "npx tsx --env-file=.env --watch src/app.ts"
   },
