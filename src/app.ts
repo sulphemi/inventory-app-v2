@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import path from "path";
-import router from "./routes/router";
+import router from "./routes/router.js";
 
 const DIRNAME = import.meta.dirname;
 const PORT = process.env.PORT || 8000;
