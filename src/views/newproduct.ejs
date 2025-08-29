@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <title>New Product</title>
+    </head>
+    <body>
+        <h1>New Product</h1>
+        <form action="post">
+            <label>Product Name:</label>
+            <input type="text" />
+
+            <label>Manufacturer:</label>
+            <select name="manufacturer">
+                <% for (const manufacturer of manufacturers) { %>
+                    <option value="<%= manufacturer.manufacturerid %>">
+                        <%= manufacturer.manufacturername %>
+                    </option>
+                <% } %>
+            </select>
+
+            <label>Switch:</label>
+            <select name="switch">
+            </select>
+
+            <label>Quantity:</label>
+            <input name="quantity" type="number" />
+            <br />
+            <button>Submit</button>
+        </form>
+    </body>
+</html>

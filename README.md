@@ -1,3 +1,12 @@
+# Odin Inventory App Project
+
+This is the (Inventory App)[www.theodinproject.com/lessons/node-path-nodejs-inventory-application]
+from The Odin Project
+
+This is currently in an incomplete state, and I probably won't finish it unless
+I get really really bored or something
+
+
 # Getting started
 
 ## Dependencies
