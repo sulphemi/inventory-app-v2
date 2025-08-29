@@ -5,7 +5,10 @@
     <body>
         <% for (const keyboard of keyboards) { %>
             <p>Product: <%= keyboard.keyboardname %></p>
-            <p>ID: <%= keyboard.keyboardid %></p>
+            <p>id: <%= keyboard.keyboardid %></p>
+            <p>quantity: <%= keyboard.quantity %></p>
+            <p>manufacturer: <%= keyboard.manufacturername %></p>
+            <p>switch: <%= keyboard.switchname %></p>
         <% } %>
     </body>
 </html>
