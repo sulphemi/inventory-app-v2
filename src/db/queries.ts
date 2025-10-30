@@ -1,29 +1,10 @@
 import pool from "./pool.js";
 
-async function getAllKeyboards() {
+async function getAllItems() {
     const query = `
-SELECT
-    k.keyboardID,
-    k.keyboardName,
-    m.manufacturerName,
-    s.switchName,
-    k.quantity
-FROM keyboards AS k
-JOIN manufacturers AS m
-ON k.manufacturerID = m.manufacturerID
-JOIN switches AS s ON s.switchID = k.switchID;
+SELECT * FROM items;
 `;
     const { rows } = await pool.query(query);
-    return rows;
-}
-
-async function getManufacturers() {
-    const query = `
-SELECT manufacturerName
-FROM manufacturers;
-`
-    const { rows } = await pool.query(query);
-    console.log(rows);
     return rows;
 }
 
@@ -36,7 +17,5 @@ VALUES ('${name}');
 }
 
 export default {
-    getAllKeyboards,
-    getManufacturers,
-    newManufacturer,
+    getAllItems,
 };

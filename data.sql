@@ -1,30 +1,127 @@
-INSERT INTO manufacturers (manufacturerName)
+INSERT INTO items (
+  warehouseID,
+  sku,
+  notes,
+  quantity,
+  condition,
+  inboundDate,
+  outboundDate
+)
 VALUES
-  ('Gateron'),
-  ('Outemu'),
-  ('HMX'),
-  ('Leobog'),
-  ('Keebmonkey'),
-  ('Womier'),
-  ('Keychron');
-
-INSERT INTO switches (manufacturerID, switchName, type)
-VALUES
-  (1, 'Gateron Red', 'Linear'),
-  (1, 'Gateron Brown', 'Tactile'),
-  (2, 'Outemu White', 'Linear'),
-  (2, 'Outemu Blue', 'Clicky'),
-  (3, 'HMX Violet', 'Linear'),
-  (4, 'LEOBOG Reaper', 'Linear'),
-  (4, 'LEOBOG Graywood V3', 'Linear');
-
-INSERT INTO keyboards (manufacturerID, switchID, keyboardName, quantity)
-VALUES
-  (4, 6, 'LEOBOG Hi75', 3),
-  (4, 7, 'LEOBOG K81', 1),
-  (5, 5, 'WOBKEY Rainy75', 6),
-  (6, 3, 'Womier SK71', 2),
-  (6, 5, 'Womier SK75', 5),
-  (6, 4, 'Womier WK68', 1),
-  (7, 1, 'Keychron Q1 Max', 1),
-  (7, 2, 'Keychron V3', 2);
+(
+  '23102607',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-10-26',
+  NULL
+),
+(
+  '23111004',
+  '0999-黑色',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-10',
+  NULL
+),
+(
+  '23111005',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-10',
+  NULL
+),
+(
+  '23111910',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-19',
+  NULL
+),
+(
+  '23111916',
+  '0999-黑色',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-19',
+  NULL
+),
+(
+  '23112803',
+  '0999-黑红',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-28',
+  NULL
+),
+(
+  '23112808',
+  '0999-白色',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-28',
+  NULL
+),
+(
+  '23112812',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-11-28',
+  NULL
+),
+(
+  '23121017',
+  '0999-黑色',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2023-12-10',
+  NULL
+),
+(
+  '24000019',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  '2024-08-27',
+  NULL
+),
+(
+  '24000028',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  NULL,
+  NULL
+),
+(
+  '24000029',
+  '998-1-黑色亚光',
+  NULL,
+  1,
+  'OK-二次销售',
+  NULL,
+  NULL
+),
+(
+  '24000053',
+  'B012-1-白色',
+  NULL,
+  1,
+  '新货',
+  '2023-12-20',
+  NULL
+);

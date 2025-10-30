@@ -4,12 +4,15 @@
     </head>
     <body>
         <p><a href="./new">New entry</a></p>
-        <% for (const keyboard of keyboards) { %>
-            <p>Product: <%= keyboard.keyboardname %></p>
-            <p>id: <%= keyboard.keyboardid %></p>
-            <p>quantity: <%= keyboard.quantity %></p>
-            <p>manufacturer: <%= keyboard.manufacturername %></p>
-            <p>switch: <%= keyboard.switchname %></p>
+        <hr />
+        <% for (const item of items) { %>
+            <p>internal: <%= item.internalid %></p>
+            <p>id: <%= item.warehouseid %></p>
+            <p>quantity: <%= item.quantity %></p>
+            <p>sku: <%= item.sku %></p>
+            <p>condition: <%= item.condition %></p>
+            <p>inbound: <%= item.inbounddate %></p>
+            <hr />
         <% } %>
     </body>
 </html>

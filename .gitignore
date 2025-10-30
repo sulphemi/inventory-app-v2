@@ -1,0 +1,4 @@
+node_modules/
+.tmp/
+.s.PGSQL.5432.lock
+postgres.log
