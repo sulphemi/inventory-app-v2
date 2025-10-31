@@ -5,14 +5,33 @@
     <body>
         <p><a href="./new">New entry</a></p>
         <hr />
-        <% for (const item of items) { %>
-            <p>internal: <%= item.internalid %></p>
-            <p>id: <%= item.warehouseid %></p>
-            <p>quantity: <%= item.quantity %></p>
-            <p>sku: <%= item.sku %></p>
-            <p>condition: <%= item.condition %></p>
-            <p>inbound: <%= item.inbounddate %></p>
-            <hr />
-        <% } %>
+
+        <table>
+            <tr>
+                <th>#</th>
+                <th>序号</th>
+                <th>SKU</th>
+                <th>尺寸</th>
+                <th>备注</th>
+                <th>数量</th>
+                <th>入仓日期</th>
+                <th>状况</th>
+                <th>出仓日期</th>
+            </tr>
+
+            <% for (const item of items) { %>
+                <tr>
+                    <td><%= item.internalid %></td>
+                    <td><%= item.warehouseid %></td>
+                    <td><%= item.sku %></td>
+                    <td><%= item.size %></td>
+                    <td><%= item.notes %></td>
+                    <td><%= item.quantity %></td>
+                    <td><%= item.inbounddate %></td>
+                    <td><%= item.condition %></td>
+                    <td><%= item.outbounddate %></td>
+                </tr>
+            <% } %>
+        </table>
     </body>
 </html>
