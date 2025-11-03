@@ -2,9 +2,23 @@
     <head>
         <title>Inventory</title>
         <link rel="stylesheet" href="./index.css" />
+        <script>
+            function suggestSKU(incompleteSKU) {
+                return incompleteSKU + "hi";
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const skuPreview = document.querySelector("#sku-preview > span");
+
+                document.querySelector("#sku-input")
+                    .addEventListener("input", (event) => {
+                        console.log(event.target.value);
+                        skuPreview.innerHTML = suggestSKU(event.target.value);
+                    });
+            });
+        </script>
     </head>
     <body>
-        <p><a href="./new">New entry</a></p>
         <hr />
 
         <table>
@@ -43,7 +57,12 @@
                     <form method="post" action="/newItem">
                         <td><button>+</button></td>
                         <td><input name="warehouseid"/></td>
-                        <td><input name="sku"/></td>
+                        <td>
+                            <div id="sku-wrapper">
+                                <input name="sku" id="sku-input"/>
+                                <div id="sku-preview"><span></span></div>
+                            </div>
+                        </td>
                         <td><input name="size"/></td>
                         <td><input name="notes"/></td>
                         <td><input name="quantity"/></td>
