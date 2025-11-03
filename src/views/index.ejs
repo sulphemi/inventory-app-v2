@@ -1,37 +1,58 @@
 <html>
     <head>
         <title>Inventory</title>
+        <link rel="stylesheet" href="./index.css" />
     </head>
     <body>
         <p><a href="./new">New entry</a></p>
         <hr />
 
         <table>
-            <tr>
-                <th>#</th>
-                <th>序号</th>
-                <th>SKU</th>
-                <th>尺寸</th>
-                <th>备注</th>
-                <th>数量</th>
-                <th>入仓日期</th>
-                <th>状况</th>
-                <th>出仓日期</th>
-            </tr>
-
-            <% for (const item of items) { %>
+            <thead>
                 <tr>
-                    <td><%= item.internalid %></td>
-                    <td><%= item.warehouseid %></td>
-                    <td><%= item.sku %></td>
-                    <td><%= item.size %></td>
-                    <td><%= item.notes %></td>
-                    <td><%= item.quantity %></td>
-                    <td><%= item.inbounddate %></td>
-                    <td><%= item.condition %></td>
-                    <td><%= item.outbounddate %></td>
+                    <th>#</th>
+                    <th>序号</th>
+                    <th>SKU</th>
+                    <th>尺寸</th>
+                    <th>备注</th>
+                    <th>数量</th>
+                    <th>入仓日期</th>
+                    <th>状况</th>
+                    <th>出仓日期</th>
                 </tr>
-            <% } %>
+            </thead>
+
+            <tbody>
+                <% for (const item of items) { %>
+                    <tr>
+                        <td><%= item.internalid %></td>
+                        <td><%= item.warehouseid %></td>
+                        <td><%= item.sku %></td>
+                        <td><%= item.size %></td>
+                        <td><%= item.notes %></td>
+                        <td><%= item.quantity %></td>
+                        <td><%= item.inbounddate?.toDateString() %></td>
+                        <td><%= item.condition %></td>
+                        <td><%= item.outbounddate?.toDateString() %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <form method="post" action="/newItem">
+                        <td><button>+</button></td>
+                        <td><input name="warehouseid"/></td>
+                        <td><input name="sku"/></td>
+                        <td><input name="size"/></td>
+                        <td><input name="notes"/></td>
+                        <td><input name="quantity"/></td>
+                        <td><input type="date" name="inbounddate"/></td>
+                        <td><input name="condition"/></td>
+                        <td><input type="date" name="outbounddate"/></td>
+                    </form>
+                </tr>
+            </tfoot>
         </table>
     </body>
 </html>

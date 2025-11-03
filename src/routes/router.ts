@@ -14,4 +14,35 @@ router.post("/newmanufacturer", async (req: Request, res: Response) => {
     res.redirect("/manufacturers");
 });
 
+router.post("/newItem", async (req: Request, res: Response) => {
+    console.log(req.body);
+    if (req.body.warehouseid === null || req.body.sku === null) {
+        res.redirect("/err");
+        return;
+    }
+
+    let warehouseidNumber = +req.body.warehouseid;
+    if (!warehouseidNumber) {
+        res.redirect("/err");
+        return;
+    }
+
+    try {
+        await Queries.newItem(
+            warehouseidNumber,
+            req.body.sku! || null,
+            req.body.size || null,
+            req.body.notes || null,
+            req.body.quantity || 0,
+            req.body.condition || null,
+            req.body.inbounddate ? new Date(req.body.inbounddate) : null,
+            req.body.outbounddate ? new Date(req.body.outbounddate) : null,
+        );
+    } catch (e: Exception) {
+        res.redirect("/err");
+    }
+
+    res.redirect("/");
+});
+
 export default router;

@@ -8,53 +8,42 @@ SELECT * FROM items;
     return rows;
 }
 
-async function newManufacturer(name: string) {
-    const query = `
-INSERT INTO manufacturers (manufacturerName)
-VALUES ('${name}');
-`
-    await pool.query(query);
-}
-
 async function newItem(
     warehouseID: number,
     sku: string,
-    notes: string,
-    quantity: number,
-    condition: string,
-    inboundDate: Date,
-    outboundDate: Date
+    size: string | null,
+    notes: string | null,
+    quantity: number | null,
+    condition: string | null,
+    inboundDate: Date | null,
+    outboundDate: Date | null
 ) {
     const query = `
 INSERT INTO items (
-    warehouse_id, 
+    warehouseid, 
     sku, 
+    size, 
     notes, 
     quantity, 
     condition, 
-    inbound_date, 
-    outbound_date
+    inbounddate, 
+    outbounddate
 )
-VALUES (
-    $1, 
-    $2, 
-    $3, 
-    $4, 
-    $5, 
-    $6, 
-    $7
-)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 `;
 
     const values = [
         warehouseID,
         sku,
+        size,
         notes,
         quantity,
         condition,
         inboundDate,
         outboundDate
     ];
+
+    console.log(values);
 
     await pool.query(query, values);
 }
