@@ -6,9 +6,10 @@ CREATE TABLE items (
   internalID INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   warehouseID INTEGER NOT NULL,
   sku VARCHAR(128) NOT NULL,
+  size VARCHAR(32),
   notes TEXT,
   quantity INTEGER DEFAULT 0,
-  condition VARCHAR(128) NOT NULL,
+  condition VARCHAR(128),
   inboundDate DATE,
   outboundDate DATE
 );
