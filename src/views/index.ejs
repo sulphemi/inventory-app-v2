@@ -3,8 +3,23 @@
         <title>Inventory</title>
         <link rel="stylesheet" href="./index.css" />
         <script>
-            function suggestSKU(incompleteSKU) {
-                return incompleteSKU + "hi";
+            // TODO: add debouncing to this function
+            function suggestSKU(partialSKU, displayElement) {
+                fetch("/api/suggest", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ partialSKU: partialSKU }),
+                })
+                    .then((res) => {
+                        console.log(res)
+                        return res.json()
+                    })
+                    .then((data) => {
+                        for (const sku of data) {
+                            // TODO:
+                            console.log(sku);
+                        }
+                    });
             }
 
             document.addEventListener("DOMContentLoaded", () => {
@@ -13,7 +28,10 @@
                 document.querySelector("#sku-input")
                     .addEventListener("input", (event) => {
                         console.log(event.target.value);
-                        skuPreview.innerHTML = suggestSKU(event.target.value);
+                        const partialSKU = event.target.value;
+
+                        // skuPreview.innerHTML = suggestSKU(event.target.value);
+                        suggestSKU(partialSKU, null);
                     });
             });
         </script>

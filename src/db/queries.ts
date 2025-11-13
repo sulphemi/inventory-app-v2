@@ -48,7 +48,16 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     await pool.query(query, values);
 }
 
+async function suggestSKU(partialSKU: string) {
+    const query = `
+SELECT DISTINCT sku FROM items WHERE sku LIKE $1 || '%' LIMIT 10
+`
+    const { rows } = await pool.query(query, [ partialSKU ]);
+    return rows;
+}
+
 export default {
     getAllItems,
     newItem,
+    suggestSKU,
 };

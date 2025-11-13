@@ -8,12 +8,6 @@ router.get("/", async (req: Request, res: Response) => {
     res.render("index", { items: await Queries.getAllItems() });
 });
 
-router.post("/newmanufacturer", async (req: Request, res: Response) => {
-    console.log(req.body.manufacturername);
-    await Queries.newManufacturer(req.body.manufacturername);
-    res.redirect("/manufacturers");
-});
-
 router.post("/newItem", async (req: Request, res: Response) => {
     console.log(req.body);
     if (req.body.warehouseid === null || req.body.sku === null) {
@@ -38,11 +32,21 @@ router.post("/newItem", async (req: Request, res: Response) => {
             req.body.inbounddate ? new Date(req.body.inbounddate) : null,
             req.body.outbounddate ? new Date(req.body.outbounddate) : null,
         );
-    } catch (e: Exception) {
+    } catch (e: any) {
         res.redirect("/err");
     }
 
     res.redirect("/");
+});
+
+router.post("/api/suggest", async (req: Request, res: Response) => {
+    // TODO: add error checking please
+    console.log("REQUEST BODY ==============");
+    console.log(req.body);
+    console.log(typeof req.body)
+    const partialSKU = req.body.partialSKU;
+    console.log(partialSKU);
+    res.json(await Queries.suggestSKU(partialSKU));
 });
 
 export default router;
