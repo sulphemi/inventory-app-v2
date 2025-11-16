@@ -10,15 +10,10 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ partialSKU: partialSKU }),
                 })
-                    .then((res) => {
-                        console.log(res)
-                        return res.json()
-                    })
+                    .then((res) => res.json())
                     .then((data) => {
-                        for (const sku of data) {
-                            // TODO:
-                            console.log(sku);
-                        }
+                        const skus = data.map(({ sku }) => sku);
+                        console.log(skus);
                     });
             }
 
@@ -79,6 +74,11 @@
                             <div id="sku-wrapper">
                                 <input name="sku" id="sku-input"/>
                                 <div id="sku-preview"><span></span></div>
+                            </div>
+                            <div id="sku-suggestions">
+                                <ul>
+                                    <!-- populated by js -->
+                                </ul>
                             </div>
                         </td>
                         <td><input name="size"/></td>
