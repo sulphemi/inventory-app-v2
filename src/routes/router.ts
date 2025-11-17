@@ -39,6 +39,15 @@ router.post("/newItem", async (req: Request, res: Response) => {
     res.redirect("/");
 });
 
+router.get("/api/items/:start-:end", async (req: Request, res: Response) => {
+    const { start, end } = req.params;
+    try {
+        res.json(await Queries.getItems(start, end));
+    } catch (e: any) {
+        res.status(400).redirect("/err");
+    }
+});
+
 router.post("/api/suggest", async (req: Request, res: Response) => {
     // TODO: add error checking please
     console.log("REQUEST BODY ==============");

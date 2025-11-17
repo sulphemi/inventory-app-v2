@@ -8,6 +8,21 @@ SELECT * FROM items;
     return rows;
 }
 
+async function getItems(start: number, end: number) {
+    start--;
+    const n = end - start;
+
+    const query = `
+SELECT * FROM items 
+ORDER BY internalID
+LIMIT $1
+OFFSET $2
+`;
+
+    const { rows } = await pool.query(query, [ n, start ]);
+    return rows;
+}
+
 async function newItem(
     warehouseID: number,
     sku: string,
@@ -58,6 +73,7 @@ SELECT DISTINCT sku FROM items WHERE sku LIKE $1 || '%' LIMIT 10
 
 export default {
     getAllItems,
+    getItems,
     newItem,
     suggestSKU,
 };
