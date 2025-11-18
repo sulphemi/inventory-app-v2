@@ -8,7 +8,7 @@ router.get("/", async (req: Request, res: Response) => {
     res.render("index", { items: await Queries.getAllItems() });
 });
 
-router.post("/newItem", async (req: Request, res: Response) => {
+router.post("/api/newItem", async (req: Request, res: Response) => {
     console.log(req.body);
     if (req.body.warehouseid === null || req.body.sku === null) {
         res.redirect("/err");
@@ -22,7 +22,7 @@ router.post("/newItem", async (req: Request, res: Response) => {
     }
 
     try {
-        await Queries.newItem(
+        const newItem = await Queries.newItem(
             warehouseidNumber,
             req.body.sku! || null,
             req.body.size || null,
@@ -32,11 +32,11 @@ router.post("/newItem", async (req: Request, res: Response) => {
             req.body.inbounddate ? new Date(req.body.inbounddate) : null,
             req.body.outbounddate ? new Date(req.body.outbounddate) : null,
         );
+
+        res.json(newItem);
     } catch (e: any) {
         res.redirect("/err");
     }
-
-    res.redirect("/");
 });
 
 router.get("/api/items/:start-:end", async (req: Request, res: Response) => {

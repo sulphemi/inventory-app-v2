@@ -45,6 +45,7 @@ INSERT INTO items (
     outbounddate
 )
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING *
 `;
 
     const values = [
@@ -58,9 +59,8 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         outboundDate
     ];
 
-    console.log(values);
-
-    await pool.query(query, values);
+    const res = await pool.query(query, values);
+    return res.rows[0];
 }
 
 async function suggestSKU(partialSKU: string) {
