@@ -11,9 +11,12 @@ SELECT
     i.quantity,
     ic.condition,
     i.inboundDate,
-    i.outboundDate
+    i.outboundDate,
+    ist.status,
+    i.addendum
 FROM items AS i
-JOIN item_conditions AS ic ON i.condition_id = ic.id;
+JOIN item_conditions AS ic ON i.condition_id = ic.id
+JOIN item_status AS ist ON i.condition_id = ist.id
 `;
 
     const { rows } = await pool.query(query);
@@ -34,9 +37,12 @@ SELECT
     i.quantity,
     ic.condition,
     i.inboundDate,
-    i.outboundDate
+    i.outboundDate,
+    ist.status,
+    i.addendum
 FROM items i
 LEFT JOIN item_conditions ic ON i.condition_id = ic.id
+LEFT JOIN item_status ist ON i.status_id = ist.id
 ORDER BY i.internalID
 LIMIT $1
 OFFSET $2
@@ -47,7 +53,7 @@ OFFSET $2
 }
 
 async function getAllConditions() {
-    const query = `SELECT * from item_conditions`;
+    const query = `SELECT * FROM item_conditions`;
     const { rows } = await pool.query(query);
     return rows;
 }
@@ -60,6 +66,12 @@ VALUES ($1)
     await pool.query(query, [ condition ]);
 }
 
+async function getAllStatuses() {
+    const query = `SELECT * FROM item_status`;
+    const { rows } = await pool.query(query);
+    return rows;
+}
+
 async function newItem(
     warehouseID: string | null,
     sku: string | string | null,
@@ -67,8 +79,10 @@ async function newItem(
     notes: string | null,
     quantity: number | null,
     condition_id: number | null,
-    inboundDate: Date | null,
-    outboundDate: Date | null
+    inboundDate: string | null,
+    outboundDate: string | null,
+    status_id: number | null,
+    addendum: string | null
 ) {
     const query = `
 WITH inserted_item AS (
@@ -80,9 +94,11 @@ WITH inserted_item AS (
         quantity, 
         condition_id, 
         inbounddate, 
-        outbounddate
+        outbounddate,
+        status_id,
+        addendum
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *
 )
 SELECT 
@@ -94,9 +110,12 @@ SELECT
     i.quantity,
     ic.condition,
     i.inboundDate,
-    i.outboundDate
+    i.outboundDate,
+    ist.status,
+    addendum
 FROM inserted_item i
 LEFT JOIN item_conditions ic ON i.condition_id = ic.id
+LEFT JOIN item_status ist ON i.status_id = ist.id
 `;
 
     const values = [
@@ -107,8 +126,12 @@ LEFT JOIN item_conditions ic ON i.condition_id = ic.id
         quantity,
         condition_id,
         inboundDate,
-        outboundDate
+        outboundDate,
+        status_id,
+        addendum,
     ];
+
+    console.log(inboundDate);
 
     const res = await pool.query(query, values);
     return res.rows[0];
@@ -127,6 +150,7 @@ export default {
     getItems,
     getAllConditions,
     newCondition,
+    getAllStatuses,
     newItem,
     suggestSKU,
 };

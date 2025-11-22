@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
 import path from "path";
+import { types } from "pg";
 import router from "./routes/router.js";
 
 const DIRNAME = import.meta.dirname;
 const PORT = process.env.PORT || 8000;
 const STATIC_PATH = path.join(DIRNAME, "public");
+
+types.setTypeParser(types.builtins.DATE, (val) => val);
 
 const app = express();
 

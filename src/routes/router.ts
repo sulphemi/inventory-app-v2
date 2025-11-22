@@ -23,8 +23,10 @@ router.post("/api/newItem", async (req: Request, res: Response) => {
             req.body.notes || null,
             req.body.quantity || 0,
             req.body.condition_id || null,
-            req.body.inbounddate ? new Date(req.body.inbounddate) : null,
-            req.body.outbounddate ? new Date(req.body.outbounddate) : null,
+            req.body.inbounddate || null,
+            req.body.outbounddate || null,
+            req.body.status_id || null,
+            req.body.addendum || null,
         );
 
         res.json(newItem);
@@ -48,6 +50,10 @@ router.get("/api/all", async (req: Request, res: Response) => {
 
 router.get("/api/conditions", async (req: Request, res: Response) => {
     res.json(await Queries.getAllConditions());
+});
+
+router.get("/api/status", async (req: Request, res: Response) => {
+    res.json(await Queries.getAllStatuses());
 });
 
 router.post("/api/suggest", async (req: Request, res: Response) => {
