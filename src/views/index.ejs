@@ -2,34 +2,6 @@
     <head>
         <title>Inventory</title>
         <link rel="stylesheet" href="./index.css" />
-        <script>
-            // TODO: add debouncing to this function
-            function suggestSKU(partialSKU, displayElement) {
-                fetch("/api/suggest", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ partialSKU: partialSKU }),
-                })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        const skus = data.map(({ sku }) => sku);
-                        console.log(skus);
-                    });
-            }
-
-            document.addEventListener("DOMContentLoaded", () => {
-                const skuPreview = document.querySelector("#sku-preview > span");
-
-                document.querySelector("#sku-input")
-                    .addEventListener("input", (event) => {
-                        console.log(event.target.value);
-                        const partialSKU = event.target.value;
-
-                        // skuPreview.innerHTML = suggestSKU(event.target.value);
-                        suggestSKU(partialSKU, null);
-                    });
-            });
-        </script>
     </head>
     <body>
         <hr />
@@ -46,6 +18,8 @@
                     <th>入仓日期</th>
                     <th>状况</th>
                     <th>出仓日期</th>
+                    <th>Status</th>
+                    <th>Addendum</th>
                 </tr>
             </thead>
 
@@ -58,9 +32,11 @@
                         <td><%= item.size %></td>
                         <td><%= item.notes %></td>
                         <td><%= item.quantity %></td>
-                        <td><%= item.inbounddate?.toDateString() %></td>
+                        <td><%= item.inbounddate %></td>
                         <td><%= item.condition %></td>
-                        <td><%= item.outbounddate?.toDateString() %></td>
+                        <td><%= item.outbounddate %></td>
+                        <td><%= item.status %></td>
+                        <td><%= item.addendum %></td>
                     </tr>
                 <% } %>
             </tbody>
@@ -70,23 +46,15 @@
                     <form method="post" action="/newItem">
                         <td><button>+</button></td>
                         <td><input name="warehouseid"/></td>
-                        <td>
-                            <div id="sku-wrapper">
-                                <input name="sku" id="sku-input"/>
-                                <div id="sku-preview"><span></span></div>
-                            </div>
-                            <div id="sku-suggestions">
-                                <ul>
-                                    <!-- populated by js -->
-                                </ul>
-                            </div>
-                        </td>
+                        <td><input name="sku" id="sku-input"/></td>
                         <td><input name="size"/></td>
                         <td><input name="notes"/></td>
                         <td><input name="quantity"/></td>
                         <td><input type="date" name="inbounddate"/></td>
                         <td><input name="condition"/></td>
                         <td><input type="date" name="outbounddate"/></td>
+                        <td><input name="status"/></td>
+                        <td><input name="addendum"/></td>
                     </form>
                 </tr>
             </tfoot>

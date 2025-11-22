@@ -57,13 +57,7 @@ router.get("/api/status", async (req: Request, res: Response) => {
 });
 
 router.post("/api/suggest", async (req: Request, res: Response) => {
-    // TODO: add error checking please
-    console.log("REQUEST BODY ==============");
-    console.log(req.body);
-    console.log(typeof req.body)
-    const partialSKU = req.body.partialSKU;
-    console.log(partialSKU);
-    res.json(await Queries.suggestSKU(partialSKU));
+    res.json(await Queries.suggestSKU(req.body.partialSKU || ""));
 });
 
 router.post("/api/newCondition", async (req: Request, res: Response) => {
