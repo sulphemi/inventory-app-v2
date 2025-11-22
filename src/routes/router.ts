@@ -18,7 +18,7 @@ router.post("/api/newItem", async (req: Request, res: Response) => {
     try {
         const newItem = await Queries.newItem(
             req.body.warehouseid,
-            req.body.sku! || null,
+            req.body.sku || null,
             req.body.size || null,
             req.body.notes || null,
             req.body.quantity || 0,
@@ -69,6 +69,33 @@ router.post("/api/newCondition", async (req: Request, res: Response) => {
 
 router.get("/api/newCondition", async (req: Request, res: Response) => {
     res.render("newcondition");
+});
+
+router.delete("/api/items/:id", async (req: Request, res: Response) => {
+    await Queries.deleteItem(+req.params.id);
+    res.json({success: true});
+});
+
+router.patch("/api/items/:id", async (req: Request, res: Response) => {
+    try {
+        const item = await Queries.editItem(
+            +req.params.id,
+            req.body.warehouseid,
+            req.body.sku || null,
+            req.body.size || null,
+            req.body.notes || null,
+            req.body.quantity || 0,
+            req.body.condition_id || null,
+            req.body.inbounddate || null,
+            req.body.outbounddate || null,
+            req.body.status_id || null,
+            req.body.addendum || null,
+        );
+
+        res.json(item);
+    } catch (e: any) {
+        res.status(500).redirect("/err");
+    }
 });
 
 export default router;
