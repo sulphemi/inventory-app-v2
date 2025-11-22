@@ -15,20 +15,14 @@ router.post("/api/newItem", async (req: Request, res: Response) => {
         return;
     }
 
-    let warehouseidNumber = +req.body.warehouseid;
-    if (!warehouseidNumber) {
-        res.redirect("/err");
-        return;
-    }
-
     try {
         const newItem = await Queries.newItem(
-            warehouseidNumber,
+            req.body.warehouseid,
             req.body.sku! || null,
             req.body.size || null,
             req.body.notes || null,
             req.body.quantity || 0,
-            req.body.condition || null,
+            req.body.condition_id || null,
             req.body.inbounddate ? new Date(req.body.inbounddate) : null,
             req.body.outbounddate ? new Date(req.body.outbounddate) : null,
         );
@@ -42,10 +36,18 @@ router.post("/api/newItem", async (req: Request, res: Response) => {
 router.get("/api/items/:start-:end", async (req: Request, res: Response) => {
     const { start, end } = req.params;
     try {
-        res.json(await Queries.getItems(start, end));
+        res.json(await Queries.getItems(+start, +end));
     } catch (e: any) {
         res.status(400).redirect("/err");
     }
+});
+
+router.get("/api/all", async (req: Request, res: Response) => {
+    res.json(await Queries.getAllItems());
+});
+
+router.get("/api/conditions", async (req: Request, res: Response) => {
+    res.json(await Queries.getAllConditions());
 });
 
 router.post("/api/suggest", async (req: Request, res: Response) => {
@@ -56,6 +58,17 @@ router.post("/api/suggest", async (req: Request, res: Response) => {
     const partialSKU = req.body.partialSKU;
     console.log(partialSKU);
     res.json(await Queries.suggestSKU(partialSKU));
+});
+
+router.post("/api/newCondition", async (req: Request, res: Response) => {
+    const { condition } = req.body;
+    console.log(`received: ${condition}`);
+    await Queries.newCondition(condition);
+    res.redirect("/");
+});
+
+router.get("/api/newCondition", async (req: Request, res: Response) => {
+    res.render("newcondition");
 });
 
 export default router;
