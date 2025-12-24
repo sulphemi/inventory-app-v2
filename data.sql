@@ -1,5 +1,9 @@
 \c ng_inventory
 
+INSERT INTO spreadsheets (spreadsheet)
+VALUES ('Main Inventory')
+ON CONFLICT (spreadsheet) DO NOTHING;
+
 INSERT INTO item_conditions (condition)
 VALUES 
   ('OK-二次销售'), 
@@ -13,22 +17,22 @@ VALUES
   ('弃置'),
   ('报废')
 ON CONFLICT (status) DO NOTHING;
-  
 
 INSERT INTO items (
-  warehouseID, 
-  sku, 
-  size, 
-  notes, 
-  quantity, 
-  condition_id, 
-  inboundDate, 
+  warehouse_id,
+  sku,
+  size,
+  notes,
+  quantity,
+  condition_id,
+  inboundDate,
   outboundDate,
   status_id,
-  addendum
+  addendum,
+  spreadsheet_id
 )
 SELECT 
-  d.warehouseID,
+  d.warehouse_id,
   d.sku,
   d.size,
   d.notes,
@@ -37,7 +41,8 @@ SELECT
   d.inboundDate::DATE,
   d.outboundDate::DATE,
   ist.id,
-  d.addendum
+  d.addendum,
+  1
 FROM (VALUES
   ('23102607', '998-1-黑色亚光', '69', NULL, 1, 'OK-二次销售', '2023-10-26', NULL, '存储', NULL),
   ('23111004', '0999-黑色', '420', NULL, 1, 'OK-二次销售', '2023-11-10', NULL, '存储', NULL),
@@ -52,6 +57,6 @@ FROM (VALUES
   ('24000028', '998-1-黑色亚光', '90', NULL, 1, 'OK-二次销售', NULL, NULL, '存储', NULL),
   ('24000029', '998-1-黑色亚光', '100', NULL, 1, 'OK-二次销售', NULL, NULL, '存储', NULL),
   ('24000053', 'B012-1-白色', '200', NULL, 1, '新货', '2023-12-20', NULL, '存储', NULL)
-) AS d(warehouseID, sku, size, notes, quantity, condition_text, inboundDate, outboundDate, status_text, addendum)
+) AS d(warehouse_id, sku, size, notes, quantity, condition_text, inboundDate, outboundDate, status_text, addendum)
 JOIN item_conditions ic ON d.condition_text = ic.condition
 JOIN item_status ist ON d.status_text = ist.status;

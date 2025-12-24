@@ -3,8 +3,8 @@ import pool from "./pool.js";
 async function getAllItems() {
     const query = `
 SELECT
-    i.internalID,
-    i.warehouseID,
+    i.internal_id,
+    i.warehouse_id,
     i.sku,
     i.size,
     i.notes,
@@ -29,8 +29,8 @@ async function getItems(start: number, end: number) {
 
     const query = `
 SELECT 
-    i.internalID,
-    i.warehouseID,
+    i.internal_id,
+    i.warehouse_id,
     i.sku,
     i.size,
     i.notes,
@@ -43,7 +43,7 @@ SELECT
 FROM items i
 LEFT JOIN item_conditions ic ON i.condition_id = ic.id
 LEFT JOIN item_status ist ON i.status_id = ist.id
-ORDER BY i.internalID
+ORDER BY i.internal_id
 LIMIT $1
 OFFSET $2
 `;
@@ -73,7 +73,7 @@ async function getAllStatuses() {
 }
 
 async function newItem(
-    warehouseID: string | null,
+    warehouse_id: string | null,
     sku: string | string | null,
     size: string | null,
     notes: string | null,
@@ -87,7 +87,7 @@ async function newItem(
     const query = `
 WITH inserted_item AS (
     INSERT INTO items (
-        warehouseid, 
+        warehouse_id, 
         sku, 
         size, 
         notes, 
@@ -102,8 +102,8 @@ WITH inserted_item AS (
     RETURNING *
 )
 SELECT 
-    i.internalID,
-    i.warehouseID,
+    i.internal_id,
+    i.warehouse_id,
     i.sku,
     i.size,
     i.notes,
@@ -119,7 +119,7 @@ LEFT JOIN item_status ist ON i.status_id = ist.id
 `;
 
     const values = [
-        warehouseID,
+        warehouse_id,
         sku,
         size,
         notes,
@@ -136,8 +136,8 @@ LEFT JOIN item_status ist ON i.status_id = ist.id
 }
 
 async function editItem(
-    internalID: number,
-    warehouseID: string | null,
+    internal_id: number,
+    warehouse_id: string | null,
     sku: string | string | null,
     size: string | null,
     notes: string | null,
@@ -152,7 +152,7 @@ async function editItem(
 WITH updated_item AS (
     UPDATE items 
     SET 
-        warehouseid = $1, 
+        warehouse_id = $1, 
         sku = $2, 
         size = $3, 
         notes = $4, 
@@ -162,12 +162,12 @@ WITH updated_item AS (
         outbounddate = $8,
         status_id = $9,
         addendum = $10
-    WHERE internalID = $11
+    WHERE internal_id = $11
     RETURNING *
 )
 SELECT 
-    i.internalID,
-    i.warehouseID,
+    i.internal_id,
+    i.warehouse_id,
     i.sku,
     i.size,
     i.notes,
@@ -183,7 +183,7 @@ LEFT JOIN item_status ist ON i.status_id = ist.id
 `;
 
     const values = [
-        warehouseID,
+        warehouse_id,
         sku,
         size,
         notes,
@@ -193,16 +193,16 @@ LEFT JOIN item_status ist ON i.status_id = ist.id
         outboundDate,
         status_id,
         addendum,
-        internalID
+        internal_id
     ];
 
     const res = await pool.query(query, values);
     return res.rows[0];
 }
 
-async function deleteItem(internalID: number) {
-    const query = `DELETE FROM items WHERE internalID = $1`;
-    await pool.query(query, [internalID]);
+async function deleteItem(internal_id: number) {
+    const query = `DELETE FROM items WHERE internal_id = $1`;
+    await pool.query(query, [internal_id]);
 }
 
 async function suggestSKU(partialSKU: string) {
@@ -211,6 +211,48 @@ SELECT DISTINCT sku FROM items WHERE sku LIKE $1 || '%' LIMIT 10
 `
     const { rows } = await pool.query(query, [ partialSKU ]);
     return rows;
+}
+
+async function getSpreadsheets() {
+    const query = `SELECT * FROM spreadsheets`;
+
+    const { rows } = await pool.query(query);
+    return rows;
+}
+
+async function getSpreadsheetRows(spreadsheet_id: number, limit: number, offset: number) {
+    const query = `
+SELECT 
+    i.internal_id,
+    i.warehouse_id,
+    i.sku,
+    i.size,
+    i.notes,
+    i.quantity,
+    ic.condition,
+    i.inboundDate,
+    i.outboundDate,
+    ist.status,
+    i.addendum
+FROM items i
+LEFT JOIN item_conditions ic ON i.condition_id = ic.id
+LEFT JOIN item_status ist ON i.status_id = ist.id
+WHERE spreadsheet_id = $1
+ORDER BY i.internal_id
+LIMIT $2
+OFFSET $3
+`;
+
+    const { rows } = await pool.query(query, [spreadsheet_id, limit, offset]);
+    return rows;
+}
+
+async function newSpreadsheet(spreadsheetName : string) {
+    const query = `
+INSERT INTO spreadsheets (spreadsheet)
+VALUES $1
+`;
+    await pool.query(query, [ spreadsheetName ]);
 }
 
 export default {
@@ -223,4 +265,7 @@ export default {
     editItem,
     deleteItem,
     suggestSKU,
+    getSpreadsheets,
+    getSpreadsheetRows,
+    newSpreadsheet,
 };

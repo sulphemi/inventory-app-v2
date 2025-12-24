@@ -10,14 +10,14 @@ router.get("/", async (req: Request, res: Response) => {
 
 router.post("/api/newItem", async (req: Request, res: Response) => {
     console.log(req.body);
-    if (req.body.warehouseid === null || req.body.sku === null) {
+    if (req.body.warehouse_id === null || req.body.sku === null) {
         res.redirect("/err");
         return;
     }
 
     try {
         const newItem = await Queries.newItem(
-            req.body.warehouseid,
+            req.body.warehouse_id,
             req.body.sku || null,
             req.body.size || null,
             req.body.notes || null,
@@ -80,7 +80,7 @@ router.patch("/api/items/:id", async (req: Request, res: Response) => {
     try {
         const item = await Queries.editItem(
             +req.params.id,
-            req.body.warehouseid,
+            req.body.warehouse_id,
             req.body.sku || null,
             req.body.size || null,
             req.body.notes || null,
@@ -96,6 +96,25 @@ router.patch("/api/items/:id", async (req: Request, res: Response) => {
     } catch (e: any) {
         res.status(500).redirect("/err");
     }
+});
+
+router.get("/api/spreadsheets", async (req: Request, res: Response) => {
+    res.json(await Queries.getSpreadsheets());
+});
+
+router.get("/api/spreadsheets/:spreadsheet_id/items", async (req: Request, res: Response) => {
+    const { spreadsheet_id } = req.params;
+    const { limit, offset } = req.query;
+
+    const limit_num = limit ? +limit : 69420; // ideally this would be infinity
+    const offset_num = offset ? +offset : 0;
+
+    res.json(await Queries.getSpreadsheetRows(+spreadsheet_id, limit_num, offset_num));
+});
+
+router.post("/api/spreadsheets/new", async (req: Request, res: Response) => {
+    const { name } = req.body;
+    res.json(await Queries.newSpreadsheet(name));
 });
 
 export default router;
