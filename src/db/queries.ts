@@ -247,12 +247,28 @@ OFFSET $3
     return rows;
 }
 
-async function newSpreadsheet(spreadsheetName : string) {
+async function newSpreadsheet(spreadsheetName: string) {
     const query = `
 INSERT INTO spreadsheets (spreadsheet)
 VALUES $1
 `;
     await pool.query(query, [ spreadsheetName ]);
+}
+
+async function newStatus(statusName: string) {
+    const query = `
+INSERT INTO item_status (status)
+VALUES $1
+`;
+    await pool.query(query, [ statusName ]);
+}
+
+async function deleteStatus(status_id: number) {
+    const query = `
+DELETE FROM item_status
+WHERE id = $1
+`;
+    await pool.query(query, [ status_id ]);
 }
 
 export default {
@@ -268,4 +284,6 @@ export default {
     getSpreadsheets,
     getSpreadsheetRows,
     newSpreadsheet,
+    newStatus,
+    deleteStatus,
 };

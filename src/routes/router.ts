@@ -117,4 +117,15 @@ router.post("/api/spreadsheets/new", async (req: Request, res: Response) => {
     res.json(await Queries.newSpreadsheet(name));
 });
 
+router.post("/api/status/new", async (req: Request, res: Response) => {
+    const { name } = req.body;
+    res.json(await Queries.newStatus(name));
+});
+
+router.delete("/api/status/:id", async (req: Request, res: Response) => {
+    const { id } = req.params;
+    await Queries.deleteStatus(+id);
+    res.json({ success: true });
+});
+
 export default router;
