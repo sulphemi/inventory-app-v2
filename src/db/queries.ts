@@ -48,7 +48,7 @@ LIMIT $1
 OFFSET $2
 `;
 
-    const { rows } = await pool.query(query, [n, start]);
+    const { rows } = await pool.query(query, [ n, start ]);
     return rows;
 }
 
@@ -220,7 +220,7 @@ async function getSpreadsheets() {
     return rows;
 }
 
-async function getSpreadsheetRows(spreadsheet_id: number, limit: number, offset: number) {
+async function getSpreadsheetRows(spreadsheet_id: number, limit: number | null, offset: number) {
     const query = `
 SELECT 
     i.internal_id,

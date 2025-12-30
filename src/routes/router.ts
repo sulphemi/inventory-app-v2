@@ -106,7 +106,7 @@ router.get("/api/spreadsheets/:spreadsheet_id/items", async (req: Request, res: 
     const { spreadsheet_id } = req.params;
     const { limit, offset } = req.query;
 
-    const limit_num = limit ? +limit : 69420; // ideally this would be infinity
+    const limit_num = limit ? +limit : null;
     const offset_num = offset ? +offset : 0;
 
     res.json(await Queries.getSpreadsheetRows(+spreadsheet_id, limit_num, offset_num));
