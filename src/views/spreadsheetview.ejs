@@ -1,0 +1,27 @@
+<%- include('partials/header', {title: 'Home Page'}) %>
+
+<div>
+    <% for (const row of rows) { %>
+        <div><span><%= row.warehouse_id %></span></div>
+        <div><span><%= row.sku %></span></div>
+        <div><span><%= row.size %></span></div>
+        <div><span><%= row.notes %></span></div>
+        <div><span><%= row.quantity %></span></div>
+        <div><span><%= row.condition %></span></div>
+        <div><span><%= row.inbounddate %></span></div>
+        <div><span><%= row.outbounddate %></span></div>
+        <div><span><%= row.status %></span></div>
+        <div><span><%= row.addendum %></span></div>
+        <div><span>
+            <a href="/item/<%= row.internal_id %>" target="_blank">Item Details</a>
+        </span></div>
+        <hr />
+    <% } %>
+
+    <a href="./<%= currpage - 1%>">Prev page</a>
+    <a href="./<%= currpage + 1 %>">Next page</a>
+    <p>Current Page: <strong><%= currpage %></strong></p>
+    <p>Total: <strong><%= totalpages %></strong> pages</p>
+</div>
+
+<%- include('partials/footer') %>

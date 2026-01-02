@@ -247,6 +247,17 @@ OFFSET $3
     return rows;
 }
 
+async function countSpreadsheetRows(spreadsheet_id: number) {
+    const query = `
+SELECT COUNT(*)::int AS count
+FROM items
+WHERE spreadsheet_id = $1
+`;
+
+    const { rows } = await pool.query(query, [ spreadsheet_id ]);
+    return rows[0].count;
+}
+
 async function newSpreadsheet(spreadsheetName: string) {
     const query = `
 INSERT INTO spreadsheets (spreadsheet)
@@ -283,6 +294,7 @@ export default {
     suggestSKU,
     getSpreadsheets,
     getSpreadsheetRows,
+    countSpreadsheetRows,
     newSpreadsheet,
     newStatus,
     deleteStatus,

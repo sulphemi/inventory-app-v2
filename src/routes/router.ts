@@ -16,6 +16,29 @@ router.get("/newSpreadsheet", async (req: Request, res: Response) => {
     res.render("newSpreadsheet");
 });
 
+router.get("/spreadsheets/:id", async (req: Request, res: Response) => {
+    res.redirect(`/spreadsheets/${req.params.id}/1`);
+});
+
+router.get("/spreadsheets/:id/:page", async (req: Request, res: Response) => {
+    // TODO: set default limit only if there is none given
+    const DEFAULT_PAGE_LIMIT = 50;
+
+    const limit = DEFAULT_PAGE_LIMIT;
+    const id = +req.params.id;
+    const page = +req.params.page;
+    const offset = limit * (page - 1);
+
+    res.render("spreadsheetview",
+        {
+            rows: await Queries.getSpreadsheetRows(id, limit, offset),
+            limit: limit,
+            currpage: page,
+            totalpages: Math.ceil(await Queries.countSpreadsheetRows(id) / limit),
+        }
+    );
+});
+
 router.post("/api/newSpreadsheet", async (req: Request, res: Response) => {
     console.log(req.body);
     await Queries.newSpreadsheet(req.body.spreadsheetname);
