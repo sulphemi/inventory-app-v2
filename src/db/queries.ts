@@ -250,7 +250,7 @@ OFFSET $3
 async function newSpreadsheet(spreadsheetName: string) {
     const query = `
 INSERT INTO spreadsheets (spreadsheet)
-VALUES $1
+VALUES ($1)
 `;
     await pool.query(query, [ spreadsheetName ]);
 }
@@ -258,7 +258,7 @@ VALUES $1
 async function newStatus(statusName: string) {
     const query = `
 INSERT INTO item_status (status)
-VALUES $1
+VALUES ($1)
 `;
     await pool.query(query, [ statusName ]);
 }
