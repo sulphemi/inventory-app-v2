@@ -1,0 +1,13 @@
+<%- include("partials/header", {title: ""}) %>
+
+<ul>
+    <% for (const spreadsheet of spreadsheets) { %>
+        <li>
+            <a href="<%= spreadsheet.id %>"><%= spreadsheet.spreadsheet%></span>
+        </li>
+    <% } %>
+
+    <a href="/newSpreadsheet">New Spreadsheet</a>
+</ul>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,8 @@
+<%- include('partials/header', {title: 'Home Page'}) %>
+
+<form action="/api/newSpreadsheet" method="POST">
+    <input type="text" name="spreadsheetname">
+    <button>Submit</button>
+</form>
+
+<%- include('partials/footer') %>

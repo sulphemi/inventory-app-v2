@@ -8,6 +8,20 @@ router.get("/", async (req: Request, res: Response) => {
     res.render("index", { items: await Queries.getAllItems() });
 });
 
+router.get("/spreadsheets", async (req: Request, res: Response) => {
+    res.render("spreadsheets", { spreadsheets: await Queries.getSpreadsheets() });
+});
+
+router.get("/newSpreadsheet", async (req: Request, res: Response) => {
+    res.render("newSpreadsheet");
+});
+
+router.post("/api/newSpreadsheet", async (req: Request, res: Response) => {
+    console.log(req.body);
+    await Queries.newSpreadsheet(req.body.spreadsheetname);
+    res.redirect("/spreadsheets");
+})
+
 router.post("/api/newItem", async (req: Request, res: Response) => {
     console.log(req.body);
     if (req.body.warehouse_id === null || req.body.sku === null) {
