@@ -1,5 +1,8 @@
 <%- include('partials/header', {title: 'Home Page'}) %>
 
+<a href="/spreadsheets">View All Spreadsheets</a>
+<p>Viewing <strong><%= rows.length %></strong> items</p>
+
 <div>
     <% for (const row of rows) { %>
         <div><span><%= row.warehouse_id %></span></div>
