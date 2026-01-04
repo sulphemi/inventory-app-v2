@@ -20,6 +20,20 @@ router.get("/spreadsheets/:id", async (req: Request, res: Response) => {
     res.redirect(`/spreadsheets/${req.params.id}/1`);
 });
 
+router.get("/spreadsheets/:id/newItem", async (req: Request, res: Response) => {
+    res.render("newItem", 
+        {
+            conditionlist: await Queries.getAllConditions(),
+            statuslist: await Queries.getAllStatuses(),
+            
+        }
+    );
+});
+
+router.post("/spreadsheets/:id/newItem", async (req: Request, res: Response) => {
+    res.redirect("/spreadsheets/");
+});
+
 router.get("/spreadsheets/:id/:page", async (req: Request, res: Response) => {
     // TODO: set default limit only if there is none given
     const DEFAULT_PAGE_LIMIT = 50;
@@ -35,6 +49,7 @@ router.get("/spreadsheets/:id/:page", async (req: Request, res: Response) => {
             limit: limit,
             currpage: page,
             totalpages: Math.ceil(await Queries.countSpreadsheetRows(id) / limit),
+            spreadsheetid: id,
         }
     );
 });
@@ -45,6 +60,7 @@ router.post("/api/newSpreadsheet", async (req: Request, res: Response) => {
     res.redirect("/spreadsheets");
 })
 
+// NOTE: DEPRECATED
 router.post("/api/newItem", async (req: Request, res: Response) => {
     console.log(req.body);
     if (req.body.warehouse_id === null || req.body.sku === null) {

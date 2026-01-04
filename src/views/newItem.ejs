@@ -1,0 +1,48 @@
+<%- include('partials/header', {title: 'Home Page'}) %>
+
+<h1>New Item</h1>
+
+<form action="/api/newItem" method="POST">
+    <label>warehouseid</label>
+    <input name="warehouse_id" type="text" />
+
+    <label>SKU</label>
+    <input name="sku" type="text" />
+
+    <label>size</label>
+    <input name="size" type="text" />
+
+    <label>note</label>
+    <input name="notes" type="text" />
+
+    <label>quantity</label>
+    <input name="quantity" type="text" />
+
+    <label>indate</label>
+    <input name="inbounddate" type="date" />
+
+    <label>condition</label>
+    <select name="condition">
+        <% for (const condition of conditionlist) { %>
+            <option value="<%= condition.id %>"><%= condition.condition %></option>
+        <% } %>
+    </select>
+
+
+    <label>outdate</label>
+    <input name="outbounddate" type="date" />
+
+    <label>status</label>
+    <select name="status">
+        <% for (const status of statuslist) { %>
+            <option value="<%= status.id %>"><%= status.status %></option>
+        <% } %>
+    </select>
+
+    <label>additional notes</label>
+    <textarea name="addendum"></textarea>
+
+    <button>Submit</button>
+</form>
+
+<%- include('partials/footer') %>
