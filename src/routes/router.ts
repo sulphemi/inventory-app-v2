@@ -25,13 +25,31 @@ router.get("/spreadsheets/:id/newItem", async (req: Request, res: Response) => {
         {
             conditionlist: await Queries.getAllConditions(),
             statuslist: await Queries.getAllStatuses(),
-            
+            spreadsheet_id: req.params.id,
         }
     );
 });
 
 router.post("/spreadsheets/:id/newItem", async (req: Request, res: Response) => {
-    res.redirect("/spreadsheets/");
+    console.log(req.body);
+    const spreadsheet_id = req.params.id;
+    
+    await Queries.newItem(
+        req.body.warehouse_id,
+        req.body.sku || null,
+        req.body.size || null,
+        req.body.notes || null,
+        req.body.quantity || 0,
+        req.body.condition_id || null,
+        req.body.inbounddate || null,
+        req.body.outbounddate || null,
+        req.body.status_id || null,
+        req.body.addendum || null,
+        spreadsheet_id,
+    );
+
+    // TODO: better to redirect to last page instead
+    res.redirect(`/spreadsheets/${spreadsheet_id}/1`);
 });
 
 router.get("/spreadsheets/:id/:page", async (req: Request, res: Response) => {
@@ -85,15 +103,6 @@ router.post("/api/newItem", async (req: Request, res: Response) => {
         res.json(newItem);
     } catch (e: any) {
         res.redirect("/err");
-    }
-});
-
-router.get("/api/items/:start-:end", async (req: Request, res: Response) => {
-    const { start, end } = req.params;
-    try {
-        res.json(await Queries.getItems(+start, +end));
-    } catch (e: any) {
-        res.status(400).redirect("/err");
     }
 });
 
