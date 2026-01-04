@@ -22,18 +22,17 @@
     <input name="inbounddate" type="date" />
 
     <label>condition</label>
-    <select name="condition">
+    <select name="condition_id">
         <% for (const condition of conditionlist) { %>
             <option value="<%= condition.id %>"><%= condition.condition %></option>
         <% } %>
     </select>
 
-
     <label>outdate</label>
     <input name="outbounddate" type="date" />
 
     <label>status</label>
-    <select name="status">
+    <select name="status_id">
         <% for (const status of statuslist) { %>
             <option value="<%= status.id %>"><%= status.status %></option>
         <% } %>
