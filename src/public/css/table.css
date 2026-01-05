@@ -1,0 +1,62 @@
+.table {
+    border: solid 1px black;
+}
+
+.row {
+    display: flex;
+}
+
+.row:nth-child(odd) {
+    background: lightgray;
+}
+
+.table-header {
+    background: gray;
+    font-weight: bold;
+}
+
+.cell {
+    display: block;
+    margin: 4px 20px;
+    padding: 2px;
+}
+
+.cell > span {
+    display: block;
+}
+
+.warehouse_id {
+    width: 120px;
+}
+
+.sku {
+    width: 200px;
+}
+
+.size {
+    width: 100px;
+}
+
+.notes {
+    width: 100px;
+}
+
+.quantity {
+    width: 100px;
+}
+
+.condition {
+    width: 120px;
+}
+
+.inbounddate, .outbounddate {
+    width: 120px;
+}
+
+.status {
+    width: 120px;
+}
+
+.actions {
+    width: 120px;
+}

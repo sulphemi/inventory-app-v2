@@ -61,12 +61,28 @@ router.get("/spreadsheets/:id/:page", async (req: Request, res: Response) => {
     const page = +req.params.page;
     const offset = limit * (page - 1);
 
+    const totalpages = Math.ceil(await Queries.countSpreadsheetRows(id) / limit) || 1;
+
+    // redirect to last page if page number is too high
+    if (page > totalpages) {
+        res.redirect(`/spreadsheets/${id}/${totalpages}`);
+        return;
+    }
+
+    // otherwise an invalid page redirects to the first page
+    if (page < 1 || isNaN(page)) {
+        res.redirect(`/spreadsheets/${id}/1`);
+        return;
+    }
+
+    const rows = await Queries.getSpreadsheetRows(id, limit, offset);
+
     res.render("spreadsheetview",
         {
-            rows: await Queries.getSpreadsheetRows(id, limit, offset),
+            rows: rows,
             limit: limit,
             currpage: page,
-            totalpages: Math.ceil(await Queries.countSpreadsheetRows(id) / limit),
+            totalpages: totalpages,
             spreadsheetid: id,
         }
     );

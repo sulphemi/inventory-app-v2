@@ -1,4 +1,10 @@
-<%- include("partials/header", {title: ""}) %>
+<%- include("partials/header") %>
+
+<%- include("partials/middler") %>
+
+<h1>Spreadsheets</h1>
+
+<a href="/newSpreadsheet">New Spreadsheet</a>
 
 <ul>
     <% for (const spreadsheet of spreadsheets) { %>
@@ -6,8 +12,6 @@
             <a href="/spreadsheets/<%= spreadsheet.id %>"><%= spreadsheet.spreadsheet%></span>
         </li>
     <% } %>
-
-    <a href="/newSpreadsheet">New Spreadsheet</a>
 </ul>
 
 <%- include("partials/footer") %>

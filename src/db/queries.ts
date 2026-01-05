@@ -14,11 +14,11 @@ SELECT
     i.outboundDate,
     ist.status,
     i.addendum,
-    ss.spreadsheet
+    sp.spreadsheet
 FROM items AS i
 JOIN item_conditions AS ic ON i.condition_id = ic.id
 JOIN item_status AS ist ON i.status_id = ist.id
-JOIN spreadsheets AS ss ON i.spreadsheet_id = ss.id
+JOIN spreadsheets AS sp ON i.spreadsheet_id = sp.id
 `;
 
     const { rows } = await pool.query(query);

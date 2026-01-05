@@ -1,31 +1,69 @@
-<%- include('partials/header', {title: 'Home Page'}) %>
+<%- include("partials/header") %>
+
+<link rel="stylesheet" href="/css/main.css" />
+<link rel="stylesheet" href="/css/table.css" />
+
+<%- include("partials/middler") %>
 
 <a href="/spreadsheets">View All Spreadsheets</a>
 <a href="/spreadsheets/<%= spreadsheetid %>/newItem">New Item</a>
 <p>Viewing <strong><%= rows.length %></strong> items</p>
 
-<div>
-    <% for (const row of rows) { %>
-        <div><span><%= row.warehouse_id %></span></div>
-        <div><span><%= row.sku %></span></div>
-        <div><span><%= row.size %></span></div>
-        <div><span><%= row.notes %></span></div>
-        <div><span><%= row.quantity %></span></div>
-        <div><span><%= row.condition %></span></div>
-        <div><span><%= row.inbounddate %></span></div>
-        <div><span><%= row.outbounddate %></span></div>
-        <div><span><%= row.status %></span></div>
-        <div><span><%= row.addendum %></span></div>
-        <div><span>
-            <a href="/item/<%= row.internal_id %>" target="_blank">Item Details</a>
-        </span></div>
-        <hr />
-    <% } %>
+<div class="table">
+    <div class="table-header row">
+        <div class="cell"><span class="warehouse_id">Warehouse ID</span></div>
+        <div class="cell"><span class="sku">SKU</span></div>
+        <div class="cell"><span class="size">Size</span></div>
+        <div class="cell"><span class="notes">Notes</span></div>
+        <div class="cell"><span class="quantity">Quantity</span></div>
+        <div class="cell"><span class="condition">Condition</span></div>
+        <div class="cell"><span class="inbounddate">Inbound Date</span></div>
+        <div class="cell"><span class="outbounddate">Outbound Date</span></div>
+        <div class="cell"><span class="status">Status</span></div>
+        <div class="cell"><span class="actions">Actions</span></div>
+    </div>
 
-    <a href="./<%= currpage - 1%>">Prev page</a>
-    <a href="./<%= currpage + 1 %>">Next page</a>
-    <p>Current Page: <strong><%= currpage %></strong></p>
-    <p>Total: <strong><%= totalpages %></strong> pages</p>
+    <% for (const row of rows) { %>
+        <div class="row">
+            <div class="cell">
+                <span class="warehouse_id"><%= row.warehouse_id %></span>
+            </div>
+            <div class="cell">
+                <span class="sku"><%= row.sku %></span>
+            </div>
+            <div class="cell">
+                <span class="size"><%= row.size %></span>
+            </div>
+            <div class="cell">
+                <span class="notes"><%= row.notes %></span>
+            </div>
+            <div class="cell">
+                <span class="quantity"><%= row.quantity %></span>
+            </div>
+            <div class="cell">
+                <span class="condition"><%= row.condition %></span>
+            </div>
+            <div class="cell">
+                <span class="inbounddate"><%= row.inbounddate %></span>
+            </div>
+            <div class="cell">
+                <span class="outbounddate"><%= row.outbounddate %></span>
+            </div>
+            <div class="cell">
+                <span class="status"><%= row.status %></span>
+            </div>
+            <div>
+                <span class="actions">
+                    <a href="/item/<%= row.internal_id %>" target="_blank">Item Details</a>
+                </span>
+            </div>
+        </div>
+    <% } %>
 </div>
 
-<%- include('partials/footer') %>
+<a href="./<%= currpage - 1%>" <%= currpage == 1 ? "disabled" : "" %>>Prev page</a>
+<a href="./<%= currpage + 1 %>" <%= currpage == totalpages ? "disabled" : "" %>>Next page</a>
+<p>Current Page: <strong><%= currpage %></strong></p>
+<p>Total: <strong><%= totalpages %></strong> pages</p>
+
+<%- include("partials/footer") %>

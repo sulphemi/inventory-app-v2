@@ -1,5 +1,8 @@
 <%- include('partials/header', {title: 'Home Page'}) %>
 
+<h1>New Spreadsheet</h1>
+<p>Creating new spreadsheet</p>
+<p>Enter the name of the new spreadsheet</p>
 <form action="/api/newSpreadsheet" method="POST">
     <input type="text" name="spreadsheetname">
     <button>Submit</button>
