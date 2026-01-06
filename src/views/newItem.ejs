@@ -1,49 +1,120 @@
 <%- include("partials/header") %>
 
+<link rel="stylesheet" href="/css/main.css" />
+<link rel="stylesheet" href="/css/newitemform.css" />
+
+<script>
+let skuBox = null;
+
+async function updateSKUBox(event) {
+    const partialSKU = this.value;
+    skuBox.innerHTML = "";
+
+    const suggestions = await fetchSKUSuggestions(partialSKU);
+
+    suggestions.forEach((item) => {
+        const p = document.createElement("p");
+        p.textContent = item.sku;
+        p.classList.add("sku-suggestion");
+        p.addEventListener("click", () => {
+            document.querySelector("#sku-input").value = item.sku;
+            skuBox.innerHTML = "";
+        });
+
+        skuBox.appendChild(p);
+    });
+}
+
+addEventListener("DOMContentLoaded", (event) => {
+    skuBox = document.querySelector("#sku-box");
+    document.querySelector("#sku-input").addEventListener("input", updateSKUBox);
+});
+
+async function fetchSKUSuggestions(partialSKU) {
+    const res = await fetch("/api/suggest", {
+      method: "POST",
+      body: JSON.stringify({ partialSKU }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    });
+
+    if (!res.ok) throw new Error("fetch error in fetchSKUSuggestions");
+
+    return res.json();
+}
+</script>
+
 <%- include("partials/middler") %>
 
 <h1>New Item</h1>
 
 <form method="POST">
-    <label>warehouseid</label>
-    <input name="warehouse_id" type="text" required />
+    <div class="form-section">
+        <label>warehouseid</label>
+        <input name="warehouse_id" type="text" required />
+    </div>
 
-    <label>SKU</label>
-    <input name="sku" type="text" />
+    <div class="form-section">
+        <label>SKU</label>
+        <input name="sku" type="text" id="sku-input" />
+        <div id="sku-box">
+            <!-- populated by js -->
+        </div>
+    </div>
 
-    <label>size</label>
-    <input name="size" type="text" />
+    <div class="form-section">
+        <label>size</label>
+        <input name="size" type="text" />
+    </div>
 
-    <label>note</label>
-    <input name="notes" type="text" />
+    <div class="form-section">
+        <label>note</label>
+        <input name="notes" type="text" />
+    </div>
 
-    <label>quantity</label>
-    <input name="quantity" type="text" />
+    <div class="form-section">
+        <label>quantity</label>
+        <input name="quantity" type="text" />
+    </div>
 
-    <label>indate</label>
-    <input name="inbounddate" type="date" />
+    <div class="form-section">
+        <label>indate</label>
+        <input name="inbounddate" type="date" />
+    </div>
 
-    <label>condition</label>
-    <select name="condition_id">
-        <% for (const condition of conditionlist) { %>
-            <option value="<%= condition.id %>"><%= condition.condition %></option>
-        <% } %>
-    </select>
+    <div class="form-section">
+        <label>condition</label>
+        <select name="condition_id">
+            <% for (const condition of conditionlist) { %>
+                <option value="<%= condition.id %>"><%= condition.condition %></option>
+            <% } %>
+        </select>
+    </div>
 
-    <label>outdate</label>
-    <input name="outbounddate" type="date" />
+    <div class="form-section">
+        <label>outdate</label>
+        <input name="outbounddate" type="date" />
+    </div>
 
-    <label>status</label>
-    <select name="status_id">
-        <% for (const status of statuslist) { %>
-            <option value="<%= status.id %>"><%= status.status %></option>
-        <% } %>
-    </select>
+    <div class="form-section">
+        <label>status</label>
+        <select name="status_id">
+            <% for (const status of statuslist) { %>
+                <option value="<%= status.id %>"><%= status.status %></option>
+            <% } %>
+        </select>
+    </div>
 
-    <label>additional notes</label>
-    <textarea name="addendum"></textarea>
+    <div class="form-section">
+        <label>additional notes</label>
+        <br />
+        <textarea name="addendum"></textarea>
+    </div>
 
-    <button>Submit</button>
+    <div class="form-section">
+        <button>Submit</button>
+    </div>
 </form>
 
 <%- include("partials/footer") %>

@@ -1,0 +1,23 @@
+.form-section {
+    padding: 10px;
+}
+
+#sku-box {
+    height: 100px;
+    border: 1px solid black;
+    overflow: scroll;
+    margin: 10px;
+}
+
+.sku-suggestion {
+    font-size: small;
+    padding: 1px;
+    margin: 0;
+    cursor: pointer;
+}
+
+
+.sku-suggestion:hover {
+    color: white;
+    background: black;
+}
