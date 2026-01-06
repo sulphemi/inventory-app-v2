@@ -5,6 +5,7 @@
 
 <script>
 let skuBox = null;
+let indateInput = null;
 
 async function updateSKUBox(event) {
     const partialSKU = this.value;
@@ -25,8 +26,52 @@ async function updateSKUBox(event) {
     });
 }
 
+function isValidDate(dateString) {
+    const dateObject = new Date(dateString);
+
+    // is it a valid date object?
+    if (isNaN(dateObject.getTime())) return false;
+
+    // did the date roll over?
+    const formatted = dateObject.toISOString().split('T')[0];
+    return formatted === dateString;
+}
+
+function setWarehouseID(event) {
+    // if the warehouse id is >= 6 digits,
+    // attempt to interpret the first 6 as a date
+    const wid = this.value.trim();
+
+    if (wid.length >= 6) {
+        const yy = wid.slice(0, 2);
+        const mm = wid.slice(2, 4);
+        const dd = wid.slice(4, 6);
+
+        const interpretedDate = `20${yy}-${mm}-${dd}`;
+
+        if (isValidDate(interpretedDate)) {
+            indateInput.value = interpretedDate;
+        } else {
+            console.error(`not setting indate to ${interpretedDate}`);
+        }
+    }
+}
+
+function trimInput(event) {
+    const isTextInput = event.target.tagName === "INPUT" &&
+        ["text", "search", "url", "tel", "email"].includes(event.target.type);
+    const isTextArea = event.target.tagName === "TEXTAREA";
+
+    if (isTextInput || isTextArea) {
+        event.target.value = event.target.value.trim();
+    }
+}
+
 addEventListener("DOMContentLoaded", (event) => {
     skuBox = document.querySelector("#sku-box");
+    indateInput = document.querySelector("#indate-input");
+    document.addEventListener("change", trimInput);
+    document.querySelector("#warehouseid-input").addEventListener("change", setWarehouseID);
     document.querySelector("#sku-input").addEventListener("input", updateSKUBox);
 });
 
@@ -52,7 +97,7 @@ async function fetchSKUSuggestions(partialSKU) {
 <form method="POST">
     <div class="form-section">
         <label>warehouseid</label>
-        <input name="warehouse_id" type="text" required />
+        <input name="warehouse_id" type="text" id="warehouseid-input" required />
     </div>
 
     <div class="form-section">
@@ -75,12 +120,12 @@ async function fetchSKUSuggestions(partialSKU) {
 
     <div class="form-section">
         <label>quantity</label>
-        <input name="quantity" type="text" />
+        <input name="quantity" type="number" value="1" min="1" />
     </div>
 
     <div class="form-section">
         <label>indate</label>
-        <input name="inbounddate" type="date" />
+        <input name="inbounddate" type="date" id="indate-input" />
     </div>
 
     <div class="form-section">
