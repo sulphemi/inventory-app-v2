@@ -14,11 +14,11 @@ SELECT
     i.outboundDate,
     ist.status,
     i.addendum,
-    sp.spreadsheet
+    ss.spreadsheet
 FROM items AS i
 JOIN item_conditions AS ic ON i.condition_id = ic.id
 JOIN item_status AS ist ON i.status_id = ist.id
-JOIN spreadsheets AS sp ON i.spreadsheet_id = sp.id
+JOIN spreadsheets AS ss ON i.spreadsheet_id = ss.id
 `;
 
     const { rows } = await pool.query(query);
@@ -303,6 +303,29 @@ WHERE id = $1
     await pool.query(query, [ status_id ]);
 }
 
+async function countDays(spreadsheet_id: number, endDate: string) {
+const query = `
+SELECT 
+    COALESCE(SUM(
+        CASE 
+            WHEN date_trunc('month', inboundDate) = date_trunc('month', $1::DATE) 
+                THEN ($1::DATE - inboundDate)
+            ELSE EXTRACT(DAY FROM $1::DATE)
+        END
+    ), 0)::INTEGER AS total_days
+FROM items
+WHERE 
+    spreadsheet_id = $2
+    AND inboundDate <= $1::DATE
+    AND deleted_at IS NULL
+    AND inboundDate IS NOT NULL;
+`;
+
+    const res = await pool.query(query, [ endDate, spreadsheet_id ]);
+    return res.rows[0].total_days;
+}
+
+
 export default {
     getAllItems,
     getAllConditions,
@@ -318,4 +341,5 @@ export default {
     newSpreadsheet,
     newStatus,
     deleteStatus,
+    countDays,
 };

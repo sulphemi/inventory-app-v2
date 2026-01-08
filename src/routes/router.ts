@@ -88,6 +88,12 @@ router.get("/spreadsheets/:id/:page", async (req: Request, res: Response) => {
     );
 });
 
+router.get("/spreadsheets/:id/dayCount/:date", async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const date = req.params.date;
+    res.render("dayCount", { result: await Queries.countDays(id, date) });
+});
+
 router.post("/api/newSpreadsheet", async (req: Request, res: Response) => {
     console.log(req.body);
     await Queries.newSpreadsheet(req.body.spreadsheetname);
