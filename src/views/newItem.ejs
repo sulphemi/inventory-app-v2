@@ -96,11 +96,11 @@ async function fetchSKUSuggestions(partialSKU) {
 
 <%- include("partials/middler") %>
 
-<h1>New Item</h1>
+<h1>添加新行</h1>
 
 <form method="POST">
     <div class="form-section">
-        <label>warehouseid</label>
+        <label>序号</label>
         <input name="warehouse_id" type="text" id="warehouseid-input" required />
     </div>
 
@@ -113,27 +113,27 @@ async function fetchSKUSuggestions(partialSKU) {
     </div>
 
     <div class="form-section">
-        <label>size</label>
+        <label>尺寸</label>
         <input name="size" type="text" />
     </div>
 
     <div class="form-section">
-        <label>note</label>
+        <label>备注</label>
         <input name="notes" type="text" />
     </div>
 
     <div class="form-section">
-        <label>quantity</label>
+        <label>数量</label>
         <input name="quantity" type="number" value="1" min="1" />
     </div>
 
     <div class="form-section">
-        <label>indate</label>
+        <label>入仓日期</label>
         <input name="inbounddate" type="date" id="indate-input" />
     </div>
 
     <div class="form-section">
-        <label>condition</label>
+        <label>状况</label>
         <select name="condition_id">
             <% for (const condition of conditionList) { %>
                 <option value="<%= condition.id %>"><%= condition.condition %></option>
@@ -142,18 +142,18 @@ async function fetchSKUSuggestions(partialSKU) {
     </div>
 
     <div class="form-section">
-        <label>outdate</label>
+        <label>出仓日期</label>
         <input name="outbounddate" type="date" />
     </div>
 
     <div class="form-section">
-        <label>additional notes</label>
+        <label>附加信息</label>
         <br />
         <textarea name="addendum"></textarea>
     </div>
 
     <div class="form-section">
-        <button>Submit</button>
+        <button>OK</button>
     </div>
 </form>
 

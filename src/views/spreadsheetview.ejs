@@ -15,22 +15,22 @@ localStorage.setItem("returnTo", window.location);
     totalpages = totalPages;
 %>
 
-<a href="/">Home</a>
-<a href="/newItem">New Item</a>
-<p>Viewing <strong><%= rows.length %></strong> items</p>
+<a href="/">首页</a>
+<a href="/newItem">添加</a>
+<p>正在看<strong><%= rows.length %></strong>行</p>
 
 <div class="table">
     <div class="table-header row">
-        <div class="cell"><span class="warehouse_id">Warehouse ID</span></div>
+        <div class="cell"><span class="warehouse_id">序号</span></div>
         <div class="cell"><span class="sku">SKU</span></div>
-        <div class="cell"><span class="size">Size</span></div>
-        <div class="cell"><span class="notes">Notes</span></div>
-        <div class="cell"><span class="quantity">Quantity</span></div>
-        <div class="cell"><span class="condition">Condition</span></div>
-        <div class="cell"><span class="inbounddate">Inbound Date</span></div>
-        <div class="cell"><span class="outbounddate">Outbound Date</span></div>
-        <div class="cell"><span class="status">Status</span></div>
-        <div class="cell"><span class="actions">Actions</span></div>
+        <div class="cell"><span class="size">尺寸</span></div>
+        <div class="cell"><span class="notes">备注</span></div>
+        <div class="cell"><span class="quantity">数量</span></div>
+        <div class="cell"><span class="condition">状况</span></div>
+        <div class="cell"><span class="inbounddate">入仓日期</span></div>
+        <div class="cell"><span class="outbounddate">出仓日期</span></div>
+        <div class="cell"><span class="status">位</span></div>
+        <div class="cell"><span class="actions">...</span></div>
     </div>
 
     <% for (const row of rows) { %>
@@ -64,17 +64,17 @@ localStorage.setItem("returnTo", window.location);
             </div>
             <div>
                 <span class="actions">
-                    <a href="/item/<%= row.internal_id %>" target="_blank">Item Details</a>
-                    <a href="/editItem/<%= row.internal_id %>">Edit Item</a>
+                    <a href="/item/<%= row.internal_id %>" target="_blank">细信</a>
+                    <a href="/editItem/<%= row.internal_id %>">编辑</a>
                 </span>
             </div>
         </div>
     <% } %>
 </div>
 
-<a href="./<%= currpage - 1%>" <%= currpage == 1 ? "disabled" : "" %>>Prev page</a>
-<a href="./<%= currpage + 1 %>" <%= currpage == totalpages ? "disabled" : "" %>>Next page</a>
-<p>Current Page: <strong><%= currpage %></strong></p>
-<p>Total: <strong><%= totalpages %></strong> pages</p>
+<a href="./<%= currpage - 1%>" <%= currpage == 1 ? "disabled" : "" %>>上一页</a>
+<a href="./<%= currpage + 1 %>" <%= currpage == totalpages ? "disabled" : "" %>>下一页</a>
+<p>第<strong><%= currpage %></strong>页</p>
+<p>总共 <strong><%= totalpages %></strong>页</p>
 
 <%- include("partials/footer") %>

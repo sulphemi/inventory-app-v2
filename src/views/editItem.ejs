@@ -81,11 +81,11 @@ async function fetchSKUSuggestions(partialSKU) {
 
 <%- include("partials/middler") %>
 
-<h1>Edit Item</h1>
+<h1>编辑</h1>
 
 <form method="POST">
     <div class="form-section">
-        <label>warehouseid</label>
+        <label>序号</label>
         <input name="warehouse_id" type="text" id="warehouseid-input" value="<%= oldItemInfo.warehouse_id %>" required />
     </div>
 
@@ -97,22 +97,22 @@ async function fetchSKUSuggestions(partialSKU) {
     </div>
 
     <div class="form-section">
-        <label>size</label>
+        <label>尺寸</label>
         <input name="size" type="text" value="<%= oldItemInfo.size %>" />
     </div>
 
     <div class="form-section">
-        <label>note</label>
+        <label>备注</label>
         <input name="notes" type="text" value="<%= oldItemInfo.notes %>" />
     </div>
 
     <div class="form-section">
-        <label>quantity</label>
+        <label>数量</label>
         <input name="quantity" type="number" value="<%= oldItemInfo.quantity %>" min="1" />
     </div>
 
     <div class="form-section">
-        <label>indate</label>
+        <label>入仓日期</label>
         <% 
             let formattedInDate = "";
             if (oldItemInfo.inbounddate) {
@@ -123,7 +123,7 @@ async function fetchSKUSuggestions(partialSKU) {
     </div>
 
     <div class="form-section">
-        <label>condition</label>
+        <label>状况</label>
         <select name="condition_id">
             <% for (const condition of conditionList) { %>
                 <option value="<%= condition.id %>" <%= (condition.id == oldItemInfo.condition_id) ? 'selected' : '' %>>
@@ -134,7 +134,7 @@ async function fetchSKUSuggestions(partialSKU) {
     </div>
 
     <div class="form-section">
-        <label>outdate</label>
+        <label>出仓日期</label>
         <% 
             let formattedOutDate = "";
             if (oldItemInfo.outbounddate) {
@@ -145,22 +145,22 @@ async function fetchSKUSuggestions(partialSKU) {
     </div>
 
     <div class="form-section">
-        <label>additional notes</label>
+        <label>附加信息</label>
         <br />
         <textarea name="addendum"><%= oldItemInfo.addendum %></textarea>
     </div>
 
     <div class="form-section">
-        <button type="submit">Update Item</button>
+        <button type="submit">OK</button>
     </div>
 </form>
 
 <hr />
 
 <form action="/delete/<%= oldItemInfo.internal_id %>" method="POST">
-    <h2>Delete Item</h2>
-    <p>If you wish to delete this item:</p>
-    <button>Delete</button>
+    <h2>删除</h2>
+    <p>如果您想删除此行</p>
+    <button>删除</button>
 </form>
 
 <%- include("partials/footer") %>
