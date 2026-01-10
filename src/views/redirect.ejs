@@ -1,0 +1,12 @@
+<%- include("partials/header") %>
+
+<script>
+// apparently this is xss-able but idc for now
+window.location.replace(localStorage.getItem("returnTo") ?? "/");
+</script>
+
+<%- include("partials/middler") %>
+
+<p>Redirecting...</p>
+
+<%- include("partials/footer") %>

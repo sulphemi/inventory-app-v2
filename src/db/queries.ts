@@ -191,6 +191,14 @@ WHERE inboundDate <= $1::DATE AND deleted_at IS NULL AND inboundDate IS NOT NULL
     return res.rows[0].total_days;
 }
 
+async function getItemInfo(item_id: number) {
+    const query = `
+SELECT * FROM items WHERE internal_id = $1
+`;
+    const res = await pool.query(query, [ item_id ]);
+    return res.rows;
+}
+
 export default {
     getItems,
     getAllConditions,
@@ -198,5 +206,6 @@ export default {
     editItem,
     deleteItem,
     suggestSKU,
-    countDays
+    countDays,
+    getItemInfo,
 };

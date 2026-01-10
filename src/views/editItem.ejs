@@ -1,0 +1,166 @@
+<%- include("partials/header") %>
+
+<link rel="stylesheet" href="/css/main.css" />
+<link rel="stylesheet" href="/css/newitemform.css" />
+
+<script>
+let skuBox = null;
+let indateInput = null;
+
+async function updateSKUBox(event) {
+    const partialSKU = this.value;
+    skuBox.innerHTML = "";
+
+    const suggestions = await fetchSKUSuggestions(partialSKU);
+
+    suggestions.forEach((item) => {
+        const p = document.createElement("p");
+        p.textContent = item.sku;
+        p.classList.add("sku-suggestion");
+        p.addEventListener("click", () => {
+            document.querySelector("#sku-input").value = item.sku;
+            skuBox.innerHTML = "";
+        });
+
+        skuBox.appendChild(p);
+    });
+}
+
+function isValidDate(dateString) {
+    const dateObject = new Date(dateString);
+    if (isNaN(dateObject.getTime())) return false;
+    const formatted = dateObject.toISOString().split('T')[0];
+    return formatted === dateString;
+}
+
+function setWarehouseID(event) {
+    const wid = this.value.trim();
+    const yyy_ = (new Date()).getFullYear().toString().slice(0, 3)
+
+    if (wid.length >= 6) {
+        const _y = wid[1];
+        const mm = wid.slice(2, 4);
+        const dd = wid.slice(4, 6);
+        const interpretedDate = `${yyy_}${_y}-${mm}-${dd}`;
+        if (isValidDate(interpretedDate)) {
+            indateInput.value = interpretedDate;
+        }
+    }
+}
+
+function trimInput(event) {
+    const isTextInput = event.target.tagName === "INPUT" &&
+        ["text", "search", "url", "tel", "email"].includes(event.target.type);
+    const isTextArea = event.target.tagName === "TEXTAREA";
+
+    if (isTextInput || isTextArea) {
+        event.target.value = event.target.value.trim();
+    }
+}
+
+addEventListener("DOMContentLoaded", (event) => {
+    skuBox = document.querySelector("#sku-box");
+    indateInput = document.querySelector("#indate-input");
+    document.addEventListener("change", trimInput);
+    document.querySelector("#warehouseid-input").addEventListener("change", setWarehouseID);
+    document.querySelector("#sku-input").addEventListener("input", updateSKUBox);
+});
+
+async function fetchSKUSuggestions(partialSKU) {
+    const res = await fetch("/suggest", {
+      method: "POST",
+      body: JSON.stringify({ partialSKU }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    });
+    if (!res.ok) throw new Error("fetch error in fetchSKUSuggestions");
+    return res.json();
+}
+</script>
+
+<%- include("partials/middler") %>
+
+<h1>Edit Item</h1>
+
+<form method="POST">
+    <div class="form-section">
+        <label>warehouseid</label>
+        <input name="warehouse_id" type="text" id="warehouseid-input" value="<%= oldItemInfo.warehouse_id %>" required />
+    </div>
+
+    <div class="form-section">
+        <label>SKU</label>
+        <input name="sku" type="text" id="sku-input" value="<%= oldItemInfo.sku %>" />
+        <div id="sku-box">
+            </div>
+    </div>
+
+    <div class="form-section">
+        <label>size</label>
+        <input name="size" type="text" value="<%= oldItemInfo.size %>" />
+    </div>
+
+    <div class="form-section">
+        <label>note</label>
+        <input name="notes" type="text" value="<%= oldItemInfo.notes %>" />
+    </div>
+
+    <div class="form-section">
+        <label>quantity</label>
+        <input name="quantity" type="number" value="<%= oldItemInfo.quantity %>" min="1" />
+    </div>
+
+    <div class="form-section">
+        <label>indate</label>
+        <% 
+            let formattedInDate = "";
+            if (oldItemInfo.inbounddate) {
+                formattedInDate = new Date(oldItemInfo.inbounddate).toISOString().split('T')[0];
+            }
+        %>
+        <input name="inbounddate" type="date" id="indate-input" value="<%= formattedInDate %>" />
+    </div>
+
+    <div class="form-section">
+        <label>condition</label>
+        <select name="condition_id">
+            <% for (const condition of conditionList) { %>
+                <option value="<%= condition.id %>" <%= (condition.id == oldItemInfo.condition_id) ? 'selected' : '' %>>
+                    <%= condition.condition %>
+                </option>
+            <% } %>
+        </select>
+    </div>
+
+    <div class="form-section">
+        <label>outdate</label>
+        <% 
+            let formattedOutDate = "";
+            if (oldItemInfo.outbounddate) {
+                formattedOutDate = new Date(oldItemInfo.outbounddate).toISOString().split('T')[0];
+            }
+        %>
+        <input name="outbounddate" type="date" value="<%= formattedOutDate %>" />
+    </div>
+
+    <div class="form-section">
+        <label>additional notes</label>
+        <br />
+        <textarea name="addendum"><%= oldItemInfo.addendum %></textarea>
+    </div>
+
+    <div class="form-section">
+        <button type="submit">Update Item</button>
+    </div>
+</form>
+
+<hr />
+
+<form action="/delete/<%= oldItemInfo.internal_id %>" method="POST">
+    <h2>Delete Item</h2>
+    <p>If you wish to delete this item:</p>
+    <button>Delete</button>
+</form>
+
+<%- include("partials/footer") %>

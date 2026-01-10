@@ -78,9 +78,45 @@ router.get("/newItem", async (req: Request, res: Response) => {
     });
 });
 
-router.post("/newItem", async (req: Request, res: Response) => {
-    const spreadsheet_id = req.params.id;
+router.get("/editItem/:id", async (req: Request, res: Response) => {
+    const id = +req.params.id;
 
+    const oldItemDataRows = await Queries.getItemInfo(id);
+
+    if (oldItemDataRows.length === 0) {
+        res.status(400).send("Bad id");
+        return;
+    } 
+
+    console.log(oldItemDataRows);
+
+    res.render("editItem", {
+        oldItemInfo: oldItemDataRows[0],
+        conditionList: await Queries.getAllConditions(),
+    });
+});
+
+router.post("/editItem/:id", async (req: Request, res: Response) => {
+    const id = +req.params.id;
+
+    await Queries.editItem(
+        id,
+        req.body.warehouse_id,
+        req.body.sku || null,
+        req.body.size || null,
+        req.body.notes || null,
+        req.body.quantity || 0,
+        req.body.condition_id || null,
+        req.body.inbounddate || null,
+        req.body.outbounddate || null,
+        req.body.status_id || null,
+        req.body.addendum || null,
+    );
+
+    res.redirect("/redirect");
+});
+
+router.post("/newItem", async (req: Request, res: Response) => {
     await Queries.newItem(
         req.body.warehouse_id,
         req.body.sku || null,
@@ -92,11 +128,9 @@ router.post("/newItem", async (req: Request, res: Response) => {
         req.body.outbounddate || null,
         req.body.status_id || null,
         req.body.addendum || null,
-        spreadsheet_id,
     );
 
-    // TODO: better to redirect to last page instead
-    res.redirect("/items/1");
+    res.redirect("/redirect");
 });
 
 router.post("/suggest", async (req: Request, res: Response) => {
@@ -109,6 +143,16 @@ router.get("/bin", async (req: Request, res: Response) => {
 
 router.get("/search", async (req: Request, res: Response) => {
     res.render("search");
+});
+
+router.get("/redirect", (req: Request, res: Response) => {
+    res.render("redirect");
+});
+
+router.post("/delete/:item_id", async (req: Request, res: Response) => {
+    const id = +req.params.item_id;
+    await Queries.deleteItem(id);
+    res.redirect("/redirect");
 });
 
 export default router;

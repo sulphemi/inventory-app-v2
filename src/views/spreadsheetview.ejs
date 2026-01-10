@@ -3,6 +3,11 @@
 <link rel="stylesheet" href="/css/main.css" />
 <link rel="stylesheet" href="/css/table.css" />
 
+<script>
+// set this page to return to later
+localStorage.setItem("returnTo", window.location);
+</script>
+
 <%- include("partials/middler") %>
 
 <%
@@ -10,6 +15,7 @@
     totalpages = totalPages;
 %>
 
+<a href="/">Home</a>
 <a href="/newItem">New Item</a>
 <p>Viewing <strong><%= rows.length %></strong> items</p>
 
@@ -59,6 +65,7 @@
             <div>
                 <span class="actions">
                     <a href="/item/<%= row.internal_id %>" target="_blank">Item Details</a>
+                    <a href="/editItem/<%= row.internal_id %>">Edit Item</a>
                 </span>
             </div>
         </div>
