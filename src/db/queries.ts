@@ -1,50 +1,93 @@
 import pool from "./pool.js";
 
-async function getAllItems() {
-    const query = `
-SELECT
-    i.internal_id,
-    i.warehouse_id,
-    i.sku,
-    i.size,
-    i.notes,
-    i.quantity,
-    ic.condition,
-    i.inboundDate,
-    i.outboundDate,
-    ist.status,
-    i.addendum,
-    ss.spreadsheet
-FROM items AS i
-JOIN item_conditions AS ic ON i.condition_id = ic.id
-JOIN item_status AS ist ON i.status_id = ist.id
-JOIN spreadsheets AS ss ON i.spreadsheet_id = ss.id
-`;
+const NOT_DELETED = "i.deleted_at IS NULL";
 
-    const { rows } = await pool.query(query);
-    return rows;
+/**
+ * @brief Get items that conform to the conditions
+ * @param filters Array of { column, value } objects
+ * @param sort Array of { column, direction } objects
+ * @param notNullColumns Array of column names that must not be null
+ */
+async function getItems(
+    filters: { column: string, value: string }[] = [], 
+    sort: { column: string, direction: "ASC" | "DESC" }[] = [], 
+    limit: number | null, 
+    offset: number,
+    notNull: string[] = []
+) {
+    let baseQuery = `
+        FROM items AS i
+        JOIN item_conditions AS ic ON i.condition_id = ic.id
+        WHERE i.deleted_at IS NULL
+    `;
+
+    const values: any[] = [];
+    let paramCount = 1;
+
+    // apply prefix filters
+    for (const f of filters) {
+        baseQuery += ` AND i.${f.column} ILIKE $${paramCount}`;
+        values.push(`${f.value}%`); 
+        paramCount++;
+    }
+
+    // apply not null filters
+    for (const col of notNull) {
+        baseQuery += ` AND i.${col} IS NOT NULL`;
+    }
+
+    // count parameters used in filtering
+    const filterParamCount = paramCount - 1;
+    const countQuery = `SELECT COUNT(*)::int AS total ${baseQuery}`;
+
+    let dataQuery = `
+        SELECT
+            i.internal_id, i.warehouse_id, i.sku, i.size, i.notes,
+            i.quantity, ic.condition, i.inboundDate, i.outboundDate,
+            i.addendum
+        ${baseQuery}
+    `;
+
+    // apply sorting
+    if (sort.length > 0) {
+        const sortClauses = sort.map(s => `i.${s.column} ${s.direction}`);
+        dataQuery += ` ORDER BY ${sortClauses.join(", ")}`;
+    } else {
+        dataQuery += ` ORDER BY i.internal_id DESC`;
+    }
+
+    // apply limit
+    if (limit !== null) {
+        dataQuery += ` LIMIT $${paramCount}`;
+        values.push(limit);
+        paramCount++;
+    }
+
+    // apply offset
+    dataQuery += ` OFFSET $${paramCount}`;
+    values.push(offset);
+
+    const countRes = await pool.query(countQuery, values.slice(0, filterParamCount));
+    const dataRes = await pool.query(dataQuery, values);
+
+    return {
+        items: dataRes.rows,
+        total: countRes.rows[0].total
+    };
 }
 
+/**
+ * @brief Retrieves all item conditions
+ * @return Array of condition objects
+ */
 async function getAllConditions() {
-    const query = `SELECT * FROM item_conditions`;
-    const { rows } = await pool.query(query);
+    const { rows } = await pool.query(`SELECT * FROM item_conditions`);
     return rows;
 }
 
-async function newCondition(condition: string) {
-    const query = `
-INSERT INTO item_conditions (condition)
-VALUES ($1)
-`;
-    await pool.query(query, [ condition ]);
-}
-
-async function getAllStatuses() {
-    const query = `SELECT * FROM item_status`;
-    const { rows } = await pool.query(query);
-    return rows;
-}
-
+/**
+ * @brief Inserts a new item into the inventory
+ */
 async function newItem(
     warehouse_id: string | null,
     sku: string | null,
@@ -54,257 +97,85 @@ async function newItem(
     condition_id: number | null,
     inboundDate: string | null,
     outboundDate: string | null,
-    status_id: number | null,
-    addendum: string | null,
-    spreadsheet_id: number
-) {
-    const query = `
-INSERT INTO items (
-    warehouse_id, 
-    sku, 
-    size, 
-    notes, 
-    quantity, 
-    condition_id, 
-    inbounddate, 
-    outbounddate,
-    status_id,
-    addendum,
-    spreadsheet_id
-)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-`;
-
-    const values = [
-        warehouse_id,
-        sku,
-        size,
-        notes,
-        quantity,
-        condition_id,
-        inboundDate,
-        outboundDate,
-        status_id,
-        addendum,
-        spreadsheet_id,
-    ];
-
-    await pool.query(query, values);
-}
-
-// not currently working
-async function newItemReturning(
-    warehouse_id: string | null,
-    sku: string | string | null,
-    size: string | null,
-    notes: string | null,
-    quantity: number | null,
-    condition_id: number | null,
-    inboundDate: string | null,
-    outboundDate: string | null,
-    status_id: number | null,
     addendum: string | null
 ) {
     const query = `
-WITH inserted_item AS (
-    INSERT INTO items (
-        warehouse_id, 
-        sku, 
-        size, 
-        notes, 
-        quantity, 
-        condition_id, 
-        inbounddate, 
-        outbounddate,
-        status_id,
-        addendum
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING *
-)
-SELECT 
-    i.internal_id,
-    i.warehouse_id,
-    i.sku,
-    i.size,
-    i.notes,
-    i.quantity,
-    ic.condition,
-    i.inboundDate,
-    i.outboundDate,
-    ist.status,
+INSERT INTO items (
+    warehouse_id, sku, size, notes, quantity, 
+    condition_id, inboundDate, outboundDate, 
     addendum
-FROM inserted_item i
-LEFT JOIN item_conditions ic ON i.condition_id = ic.id
-LEFT JOIN item_status ist ON i.status_id = ist.id
+)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 `;
-
-    const values = [
-        warehouse_id,
-        sku,
-        size,
-        notes,
-        quantity,
-        condition_id,
-        inboundDate,
-        outboundDate,
-        status_id,
-        addendum,
-    ];
-
-    const res = await pool.query(query, values);
-    return res.rows[0];
+    const values = [ warehouse_id, sku, size, notes, quantity, condition_id, inboundDate, outboundDate, addendum ];
+    await pool.query(query, values);
 }
 
+/**
+ * @brief Updates an existing item and returns the updated record
+ */
 async function editItem(
     internal_id: number,
     warehouse_id: string | null,
-    sku: string | string | null,
+    sku: string | null,
     size: string | null,
     notes: string | null,
     quantity: number | null,
     condition_id: number | null,
     inboundDate: string | null,
     outboundDate: string | null,
-    status_id: number | null,
     addendum: string | null
 ) {
     const query = `
 WITH updated_item AS (
     UPDATE items 
     SET 
-        warehouse_id = $1, 
-        sku = $2, 
-        size = $3, 
-        notes = $4, 
-        quantity = $5, 
-        condition_id = $6, 
-        inbounddate = $7, 
-        outbounddate = $8,
-        status_id = $9,
-        addendum = $10
-    WHERE internal_id = $11
+        warehouse_id = $1, sku = $2, size = $3, notes = $4, 
+        quantity = $5, condition_id = $6, inboundDate = $7, 
+        outboundDate = $8, addendum = $9
+    WHERE internal_id = $10
     RETURNING *
 )
 SELECT 
-    i.internal_id,
-    i.warehouse_id,
-    i.sku,
-    i.size,
-    i.notes,
-    i.quantity,
-    ic.condition,
-    i.inboundDate,
-    i.outboundDate,
-    ist.status,
-    i.addendum
+    i.internal_id, i.warehouse_id, i.sku, i.size, i.notes, i.quantity,
+    ic.condition, i.inboundDate, i.outboundDate, i.addendum
 FROM updated_item i
 LEFT JOIN item_conditions ic ON i.condition_id = ic.id
-LEFT JOIN item_status ist ON i.status_id = ist.id
 `;
-
-    const values = [
-        warehouse_id,
-        sku,
-        size,
-        notes,
-        quantity,
-        condition_id,
-        inboundDate,
-        outboundDate,
-        status_id,
-        addendum,
-        internal_id
-    ];
-
+    const values = [ warehouse_id, sku, size, notes, quantity, condition_id, inboundDate, outboundDate, addendum, internal_id ];
     const res = await pool.query(query, values);
     return res.rows[0];
 }
 
+/**
+ * @brief Performs a soft delete on an item by setting its deleted_at timestamp
+ * @param internal_id Primary key of the item to delete
+ */
 async function deleteItem(internal_id: number) {
-    const query = `DELETE FROM items WHERE internal_id = $1`;
-    await pool.query(query, [internal_id]);
+    await pool.query(`UPDATE items SET deleted_at = NOW() WHERE internal_id = $1`, [ internal_id ]);
 }
 
+/**
+ * @brief Suggests existing SKUs based on a partial string match
+ * @param partialSKU Prefix to look for
+ * @return Array of unique SKU strings { sku: string }[]
+ */
 async function suggestSKU(partialSKU: string) {
-    const query = `
-SELECT DISTINCT sku FROM items WHERE sku LIKE $1 || '%' LIMIT 10
-`
+    const query = `SELECT DISTINCT sku FROM items i WHERE sku LIKE $1 || '%' AND ${NOT_DELETED} LIMIT 10`;
     const { rows } = await pool.query(query, [ partialSKU ]);
     return rows;
 }
 
-async function getSpreadsheets() {
-    const query = `SELECT * FROM spreadsheets`;
-
-    const { rows } = await pool.query(query);
-    return rows;
-}
-
-async function getSpreadsheetRows(spreadsheet_id: number, limit: number | null, offset: number) {
+/**
+ * @brief Calculates total holding days for active items up to a specific date
+ * @param endDate The target date for the calculation
+ * @return The sum of days items have been in inventory
+ *
+ * It only counts the days that have been part of the same month as the 
+ * given date
+ */
+async function countDays(endDate: string) {
     const query = `
-SELECT 
-    i.internal_id,
-    i.warehouse_id,
-    i.sku,
-    i.size,
-    i.notes,
-    i.quantity,
-    ic.condition,
-    i.inboundDate,
-    i.outboundDate,
-    ist.status,
-    i.addendum
-FROM items i
-LEFT JOIN item_conditions ic ON i.condition_id = ic.id
-LEFT JOIN item_status ist ON i.status_id = ist.id
-WHERE spreadsheet_id = $1
-ORDER BY i.internal_id
-LIMIT $2
-OFFSET $3
-`;
-
-    const { rows } = await pool.query(query, [spreadsheet_id, limit, offset]);
-    return rows;
-}
-
-async function countSpreadsheetRows(spreadsheet_id: number) {
-    const query = `
-SELECT COUNT(*)::int AS count
-FROM items
-WHERE spreadsheet_id = $1
-`;
-
-    const { rows } = await pool.query(query, [ spreadsheet_id ]);
-    return rows[0].count;
-}
-
-async function newSpreadsheet(spreadsheetName: string) {
-    const query = `
-INSERT INTO spreadsheets (spreadsheet)
-VALUES ($1)
-`;
-    await pool.query(query, [ spreadsheetName ]);
-}
-
-async function newStatus(statusName: string) {
-    const query = `
-INSERT INTO item_status (status)
-VALUES ($1)
-`;
-    await pool.query(query, [ statusName ]);
-}
-
-async function deleteStatus(status_id: number) {
-    const query = `
-DELETE FROM item_status
-WHERE id = $1
-`;
-    await pool.query(query, [ status_id ]);
-}
-
-async function countDays(spreadsheet_id: number, endDate: string) {
-const query = `
 SELECT 
     COALESCE(SUM(
         CASE 
@@ -314,32 +185,18 @@ SELECT
         END
     ), 0)::INTEGER AS total_days
 FROM items
-WHERE 
-    spreadsheet_id = $2
-    AND inboundDate <= $1::DATE
-    AND deleted_at IS NULL
-    AND inboundDate IS NOT NULL;
+WHERE inboundDate <= $1::DATE AND deleted_at IS NULL AND inboundDate IS NOT NULL;
 `;
-
-    const res = await pool.query(query, [ endDate, spreadsheet_id ]);
+    const res = await pool.query(query, [ endDate ]);
     return res.rows[0].total_days;
 }
 
-
 export default {
-    getAllItems,
+    getItems,
     getAllConditions,
-    newCondition,
-    getAllStatuses,
     newItem,
     editItem,
     deleteItem,
     suggestSKU,
-    getSpreadsheets,
-    getSpreadsheetRows,
-    countSpreadsheetRows,
-    newSpreadsheet,
-    newStatus,
-    deleteStatus,
-    countDays,
+    countDays
 };

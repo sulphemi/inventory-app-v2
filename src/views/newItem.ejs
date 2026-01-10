@@ -40,14 +40,18 @@ function isValidDate(dateString) {
 function setWarehouseID(event) {
     // if the warehouse id is >= 6 digits,
     // attempt to interpret the first 6 as a date
+    // specifically _YMMDD
     const wid = this.value.trim();
 
+    // we'll set the decade to the current one
+    const yyy_ = (new Date()).getFullYear().toString().slice(0, 3)
+
     if (wid.length >= 6) {
-        const yy = wid.slice(0, 2);
+        const _y = wid[1];
         const mm = wid.slice(2, 4);
         const dd = wid.slice(4, 6);
 
-        const interpretedDate = `20${yy}-${mm}-${dd}`;
+        const interpretedDate = `${yyy_}${_y}-${mm}-${dd}`;
 
         if (isValidDate(interpretedDate)) {
             indateInput.value = interpretedDate;
@@ -76,7 +80,7 @@ addEventListener("DOMContentLoaded", (event) => {
 });
 
 async function fetchSKUSuggestions(partialSKU) {
-    const res = await fetch("/api/suggest", {
+    const res = await fetch("/suggest", {
       method: "POST",
       body: JSON.stringify({ partialSKU }),
       headers: {
@@ -131,7 +135,7 @@ async function fetchSKUSuggestions(partialSKU) {
     <div class="form-section">
         <label>condition</label>
         <select name="condition_id">
-            <% for (const condition of conditionlist) { %>
+            <% for (const condition of conditionList) { %>
                 <option value="<%= condition.id %>"><%= condition.condition %></option>
             <% } %>
         </select>
@@ -140,15 +144,6 @@ async function fetchSKUSuggestions(partialSKU) {
     <div class="form-section">
         <label>outdate</label>
         <input name="outbounddate" type="date" />
-    </div>
-
-    <div class="form-section">
-        <label>status</label>
-        <select name="status_id">
-            <% for (const status of statuslist) { %>
-                <option value="<%= status.id %>"><%= status.status %></option>
-            <% } %>
-        </select>
     </div>
 
     <div class="form-section">

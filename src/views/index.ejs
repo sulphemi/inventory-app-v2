@@ -1,63 +1,12 @@
-<html>
-    <head>
-        <title>Inventory</title>
-        <link rel="stylesheet" href="./index.css" />
-    </head>
-    <body>
-        <hr />
+<%- include("partials/header") %>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>序号</th>
-                    <th>SKU</th>
-                    <th>尺寸</th>
-                    <th>备注</th>
-                    <th>数量</th>
-                    <th>入仓日期</th>
-                    <th>状况</th>
-                    <th>出仓日期</th>
-                    <th>Status</th>
-                    <th>Addendum</th>
-                </tr>
-            </thead>
+<%- include("partials/middler") %>
 
-            <tbody>
-                <% for (const item of items) { %>
-                    <tr>
-                        <td><%= item.internalid %></td>
-                        <td><%= item.warehouseid %></td>
-                        <td><%= item.sku %></td>
-                        <td><%= item.size %></td>
-                        <td><%= item.notes %></td>
-                        <td><%= item.quantity %></td>
-                        <td><%= item.inbounddate %></td>
-                        <td><%= item.condition %></td>
-                        <td><%= item.outbounddate %></td>
-                        <td><%= item.status %></td>
-                        <td><%= item.addendum %></td>
-                    </tr>
-                <% } %>
-            </tbody>
+<h1>Index</h1>
 
-            <tfoot>
-                <tr>
-                    <form method="post" action="/newItem">
-                        <td><button>+</button></td>
-                        <td><input name="warehouseid"/></td>
-                        <td><input name="sku" id="sku-input"/></td>
-                        <td><input name="size"/></td>
-                        <td><input name="notes"/></td>
-                        <td><input name="quantity"/></td>
-                        <td><input type="date" name="inbounddate"/></td>
-                        <td><input name="condition"/></td>
-                        <td><input type="date" name="outbounddate"/></td>
-                        <td><input name="status"/></td>
-                        <td><input name="addendum"/></td>
-                    </form>
-                </tr>
-            </tfoot>
-        </table>
-    </body>
-</html>
+<a href="/items/1">Sorted by timestamp</a>
+<a href="/items/1?sortBy=warehouse_id&direction=ASC">Sorted by WarehouseID</a>
+<a href="/items/1?sortBy=sku&direction=ASC">Sorted by SKU</a>
+<a href="/bin">By warehouse</a>
+
+<%- include("partials/footer") %>
