@@ -1,0 +1,20 @@
+<%- include("partials/header") %>
+
+<%- include("partials/middler") %>
+
+<div>
+    <form action="/items/1" method="GET">
+        <h2>Search</h2>
+        <select name="filterBy">
+            <option value="warehouse_id">WID</option>
+            <option value="sku">SKU</option>
+            <option value="condition">Condition</option>
+        </select>
+
+        <input type="text" name="filterValue" />
+
+        <button>Search</button>
+    </form>
+</div>
+
+<%- include("partials/footer") %>

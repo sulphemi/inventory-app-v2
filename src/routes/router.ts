@@ -43,7 +43,6 @@ router.get("/items/:page", async (req: Request, res: Response) => {
 
     const notNullColumns: string[] = [];
     if (req.query.notNull) {
-        // Expecting a comma-separated list, e.g., ?notNull=sku,size
         const cols = (req.query.notNull as string).split(',');
         cols.forEach(col => {
             const trimmed = col.trim();
@@ -106,6 +105,10 @@ router.post("/suggest", async (req: Request, res: Response) => {
 
 router.get("/bin", async (req: Request, res: Response) => {
     res.render("bin");
+});
+
+router.get("/search", async (req: Request, res: Response) => {
+    res.render("search");
 });
 
 export default router;
