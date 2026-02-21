@@ -136,8 +136,18 @@ router.get("/conditions", async (req: Request, res: Response) => {
     res.json(conditions);
 });
 
-router.get("/exceltest.xlsx", async (req: Request, res: Response) => {
-    Excel.hello(res);
+router.get("/exceltest", async (req: Request, res: Response) => {
+    const filename = "exceltest.xlsx";
+
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ); // ...apparently theres a mime type for this too
+
+    const { items } = await Queries.getItems([], [], 12, 0, []);
+
+    Excel.monthly_summary(res, items);
 });
 
 export default apirouter;
