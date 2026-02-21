@@ -44,7 +44,13 @@ async function getItems(
         SELECT
             i.internal_id, i.warehouse_id, i.sku, i.size, i.notes,
             i.quantity, ic.condition, i.inboundDate, i.outboundDate,
-            i.addendum
+            i.addendum,
+            CASE 
+                WHEN ic.condition = 'OK-二次销售' OR ic.condition = '新货' THEN '二次销售'
+                WHEN ic.condition = '穿过/损坏' THEN '报废'
+                WHEN ic.condition IN ('退错货', '一只鞋', '没有SKU') THEN '弃置'
+                ELSE '弃置' 
+            END AS status
         ${baseQuery}
     `;
 
