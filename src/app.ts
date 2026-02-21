@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import path from "path";
 import { types } from "pg";
 import router from "./routes/router.js";
+import apirouter from "./routes/apirouter.js";
 
 const DIRNAME = import.meta.dirname;
 const PORT = process.env.PORT || 8000;
@@ -20,6 +21,7 @@ app.set("views", path.join(DIRNAME, "views"));
 app.set("view engine", "ejs");
 
 app.use("/", router);
+app.use("/api", apirouter);
 
 app.listen(PORT, (err) => {
     if (err) throw err;
