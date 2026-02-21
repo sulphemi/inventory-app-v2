@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import Queries from "../db/queries.js";
+import Excel from "../db/excel.js";
 
 const apirouter = Router();
 
@@ -133,6 +134,10 @@ router.delete("/items/:id", async (req: Request, res: Response) => {
 router.get("/conditions", async (req: Request, res: Response) => {
     const conditions = await Queries.getAllConditions();
     res.json(conditions);
+});
+
+router.get("/exceltest.xlsx", async (req: Request, res: Response) => {
+    Excel.hello(res);
 });
 
 export default apirouter;
