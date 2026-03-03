@@ -1,9 +1,6 @@
 import ExcelJS from "exceljs";
 
-function monthly_summary(stream, data, enddate) {
-    console.log("i am priting data")
-    console.log(data);
-
+async function monthly_summary(stream, data, enddate) {
     // setup workbook
     const workbook = new ExcelJS.Workbook();
     workbook.calcProperties.fullCalcOnLoad = true;
@@ -95,7 +92,8 @@ function monthly_summary(stream, data, enddate) {
     });
 
     // send off the workbook
-    workbook.xlsx.write(stream);
+    await workbook.xlsx.write(stream);
+    stream.end();
 }
 
 export default {
