@@ -1,4 +1,6 @@
+import { PassThrough } from "stream";
 import { Request, Response, Router } from "express";
+import archiver from "archiver";
 import Queries from "../db/queries.js";
 import Excel from "../db/excel.js";
 
@@ -145,9 +147,56 @@ router.get("/exceltest", async (req: Request, res: Response) => {
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ); // ...apparently theres a mime type for this too
 
-    const { items } = await Queries.getItems([], [], 12, 0, []);
+    // grab the items with a db query
+    const { items } = await Queries.getItems([], [], 20, 0, []);
 
     Excel.monthly_summary(res, items);
+});
+
+router.get("/monthly_summary", async (req: Request, res: Response) => {
+    // temporary solution, should probably store this in the db
+    const WAREHOUSES = [
+        { name: "A", prefixes: [ "23", "15", "16", "17", "18", "19" ] },
+        { name: "B", prefixes: [ "24", "25", "26", "27", "28", "29", "55" ]},
+        { name: "C", prefixes: [ "35", "36", "37", "38", "39" ] },
+        { name: "D", prefixes: [ "50", "51", "56", "57", "58" ] },
+        { name: "E", prefixes: [ "45", "46", "47", "48", "49" ] },
+        { name: "F", prefixes: [ "66", "67", "68", "69" ] },
+    ];
+
+    // set proper headers
+    res.attachment('monthly_summaries.zip');
+    res.setHeader('Content-Type', 'application/zip');
+
+    // creating a zip file to pipe back to the client
+    const archive = archiver("zip", { zlib: { level: 0 } });
+    archive.pipe(res);
+
+    for (const warehouse of WAREHOUSES) {
+        const filename = `${warehouse.name}.xlsx`;
+        const data = [];
+
+        // collect the data
+        for (const prefix of warehouse.prefixes) {
+            const { items } = await Queries.getItems(
+                [ { column: "warehouse_id", value: prefix } ],
+                [], null, 0, []
+            );
+            console.log(items);
+            data.push(...items);
+        }
+
+        // create a stream to write the workbook file
+        const workbook_stream = new PassThrough();
+
+        // add the workbook file to the zip
+        archive.append(workbook_stream, { name: filename });
+
+        // create the workbook and write it into the stream
+        await Excel.monthly_summary(workbook_stream, data);
+    }
+
+    await archive.finalize();
 });
 
 export default apirouter;
