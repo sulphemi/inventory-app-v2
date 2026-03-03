@@ -9,16 +9,16 @@ async function monthly_summary(stream, data, enddate) {
 
     // this should really be from a single source of truth...
     worksheet.columns = [
-        { header: "wid", key: "warehouse_id", width: 10 },      // A
-        { header: "sku", key: "sku", width: 20 },               // B
-        { header: "sz", key: "size", width: 10 },               // C
-        { header: "nt", key: "notes", width: 10 },              // D
-        { header: "qu", key: "quantity", width: 10 },           // E
-        { header: "cnd", key: "condition", width: 20 },         // F
-        { header: "in", key: "inbounddate", width: 20 },        // G
-        { header: "out", key: "outbounddate", width: 20 },      // H
-        { header: "stat", key: "status", width: 20 },           // I
-        { header: "dc", key: "daycount", width: 10 },           // J
+        { header: "序号", key: "warehouse_id", width: 10 },     // A
+        { header: "SKU", key: "sku", width: 20 },               // B
+        { header: "尺寸", key: "size", width: 10 },             // C
+        { header: "备注", key: "notes", width: 10 },            // D
+        { header: "数量", key: "quantity", width: 10 },         // E
+        { header: "状况", key: "condition", width: 20 },        // F
+        { header: "入仓日期", key: "inbounddate", width: 20 },  // G
+        { header: "出仓日期", key: "outbounddate", width: 20 }, // H
+        { header: "处理", key: "status", width: 20 },           // I
+        { header: "天数", key: "daycount", width: 10 },         // J
     ];
 
     for (const row of data) {
