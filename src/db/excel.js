@@ -45,7 +45,22 @@ async function monthly_summary(stream, data, enddate) {
         worksheet.getCell(`J${index + 2}`).value = { sharedFormula: "J2" };
     }
 
-    //
+    // add summary lines to the bottom of the table
+    // these column names don't mean anything, they're just to position
+    // TODO: stop using data.length ffs
+    const RATE = 69420;
+    worksheet.addRow({
+        status: "Total Days",
+        daycount: { formula: `=SUM(J2:J${data.length + 1})` },
+    });
+    worksheet.addRow({
+        status: "Rate",
+        daycount: RATE,
+    });
+    worksheet.addRow({
+        status: "Charge",
+        daycount: { formula: `=J${data.length + 2}*J${data.length + 3}` },
+    });
 
     // conditional formatting styles
     const GRAY_BG = {
