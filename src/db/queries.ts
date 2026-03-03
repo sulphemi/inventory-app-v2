@@ -11,8 +11,8 @@ const NOT_DELETED = "i.deleted_at IS NULL";
 async function getItems(
     filters: { column: string, value: string }[] = [], 
     sort: { column: string, direction: "ASC" | "DESC" }[] = [], 
-    limit: number | null, 
-    offset: number,
+    limit: number | null = null, 
+    offset: number = 0,
     notNull: string[] = []
 ) {
     let baseQuery = `
