@@ -138,24 +138,9 @@ router.get("/conditions", async (req: Request, res: Response) => {
     res.json(conditions);
 });
 
-router.get("/exceltest", async (req: Request, res: Response) => {
-    const filename = "exceltest.xlsx";
-
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    res.setHeader(
-        "Content-Type",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ); // ...apparently theres a mime type for this too
-
-    // grab the items with a db query
-    const { items } = await Queries.getItems([], [], 20, 0, []);
-
-    Excel.monthly_summary(res, items);
-});
-
 router.get("/monthly_summary", async (req: Request, res: Response) => {
     // temporary solution, should probably store this in the db
-    const WAREHOUSES = [
+    const warehouses = [
         { name: "A", prefixes: [ "23", "15", "16", "17", "18", "19" ] },
         { name: "B", prefixes: [ "24", "25", "26", "27", "28", "29", "55" ]},
         { name: "C", prefixes: [ "35", "36", "37", "38", "39" ] },
@@ -165,14 +150,14 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
     ];
 
     // set proper headers
-    res.attachment('monthly_summaries.zip');
-    res.setHeader('Content-Type', 'application/zip');
+    res.attachment("monthly_summaries.zip");
+    res.setHeader("Content-Type", "application/zip");
 
     // creating a zip file to pipe back to the client
     const archive = archiver("zip", { zlib: { level: 0 } });
     archive.pipe(res);
 
-    for (const warehouse of WAREHOUSES) {
+    for (const warehouse of warehouses) {
         const filename = `${warehouse.name}.xlsx`;
         const data = [];
 
@@ -182,7 +167,6 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
                 [ { column: "warehouse_id", value: prefix } ],
                 [], null, 0, []
             );
-            console.log(items);
             data.push(...items);
         }
 

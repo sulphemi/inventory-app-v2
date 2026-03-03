@@ -37,36 +37,36 @@ async function monthly_summary(stream, data, enddate) {
     worksheet.getCell("J2").value = {
         formula: '=IF(AND(G2<=$K$1, G2<>""), IF(EOMONTH(G2,0)=EOMONTH($K$1,0), $K$1-G2, DAY($K$1)), 0)',
         shareType: "shared",
-        ref: `J2:J${data.length + 1}`, // TODO: check if this is off by one
+        ref: `J2:J${data.length + 1}`,
     };
 
     // then cascade the formula down
-    // TODO: this part will probably crash if data is empty
     for (let index = 1; index < data.length; index++) {
         worksheet.getCell(`J${index + 2}`).value = { sharedFormula: "J2" };
     }
 
+    //
+
     // conditional formatting styles
     const GRAY_BG = {
-        fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'FF6F6F7A'}},
-        border: {
-            top: {style: 'thin'},
-            left: {style: 'thin'},
-            bottom: {style: 'thin'},
-            right: {style: 'thin'},
-        }
+        fill: { type: "pattern", pattern: "solid", bgColor: { argb: "FF6F6F7A" } },
+        // border: {
+        //     top: { style: "thin" },
+        //     left: { style: "thin" },
+        //     bottom: { style: "thin" },
+        //     right: { style: "thin" },
+        // }
     };
 
     const YELLOW_BG = {
-        fill: {type: 'pattern', pattern: 'solid', bgColor: {argb: 'FFFFFF00'}},
-        border: {
-            top: {style: 'thin'},
-            left: {style: 'thin'},
-            bottom: {style: 'thin'},
-            right: {style: 'thin'},
-        }
+        fill: { type: "pattern", pattern: "solid", bgColor: { argb: "FFFFFF00" } },
+        // border: {
+        //     top: { style: "thin" },
+        //     left: { style: "thin" },
+        //     bottom: { style: "thin" },
+        //     right: { style: "thin" },
+        // }
     };
-
 
     // apply conditional formatting
     worksheet.addConditionalFormatting({
