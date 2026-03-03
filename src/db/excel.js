@@ -32,10 +32,14 @@ async function monthly_summary(stream, data, enddate) {
         worksheet.addRow(excelRow);
     }
 
+    // put the enddate in the cell
+    worksheet.getCell("L1").value = "Reference Date";
+    worksheet.getCell("L2").value = enddate;
+
     // apply daycount
     // first set master cell to first row, and slave cells all the way down
     worksheet.getCell("J2").value = {
-        formula: '=IF(AND(G2<=$K$1, G2<>""), IF(EOMONTH(G2,0)=EOMONTH($K$1,0), $K$1-G2, DAY($K$1)), 0)',
+        formula: '=IF(AND(G2<=$L$2, G2<>""), IF(EOMONTH(G2,0)=EOMONTH($L$2,0), $L$2-G2, DAY($L$2)), 0)',
         shareType: "shared",
         ref: `J2:J${data.length + 1}`,
     };

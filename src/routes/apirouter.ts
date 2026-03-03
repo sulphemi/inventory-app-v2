@@ -139,6 +139,8 @@ router.get("/conditions", async (req: Request, res: Response) => {
 });
 
 router.get("/monthly_summary", async (req: Request, res: Response) => {
+    const enddate = req.query.date.replaceAll("-", "/");
+
     // temporary solution, should probably store this in the db
     const warehouses = [
         { name: "A", prefixes: [ "23", "15", "16", "17", "18", "19" ] },
@@ -177,7 +179,7 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
         archive.append(workbook_stream, { name: filename });
 
         // create the workbook and write it into the stream
-        await Excel.monthly_summary(workbook_stream, data);
+        await Excel.monthly_summary(workbook_stream, data, enddate);
     }
 
     await archive.finalize();
