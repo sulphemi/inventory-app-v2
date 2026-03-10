@@ -57,6 +57,7 @@ async function getItems(
     // apply sorting
     if (sort.length > 0) {
         const sortClauses = sort.map(s => `i.${s.column} ${s.direction}`);
+        sortClauses.push(`i.internal_id ASC`);
         dataQuery += ` ORDER BY ${sortClauses.join(", ")}`;
     } else {
         dataQuery += ` ORDER BY i.internal_id DESC`;
@@ -73,12 +74,10 @@ async function getItems(
     dataQuery += ` OFFSET $${paramCount}`;
     values.push(offset);
 
-    const countRes = await pool.query(countQuery, values.slice(0, filterParamCount));
     const dataRes = await pool.query(dataQuery, values);
 
     return {
         items: dataRes.rows,
-        total: countRes.rows[0].total
     };
 }
 
