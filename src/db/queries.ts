@@ -165,8 +165,8 @@ async function deleteItem(internal_id: number) {
  * @param partialSKU Prefix to look for
  * @return Array of unique SKU strings { sku: string }[]
  */
-async function suggestSKU(partialSKU: string) {
-    const query = `SELECT DISTINCT sku FROM items i WHERE sku LIKE $1 || '%' AND ${NOT_DELETED} LIMIT 10`;
+async function suggestSKU(partialSKU: string, limit: number | null = null) {
+    const query = `SELECT DISTINCT sku FROM items i WHERE sku LIKE $1 || '%' AND ${NOT_DELETED} LIMIT ${limit}`;
     const { rows } = await pool.query(query, [ partialSKU ]);
     return rows;
 }
