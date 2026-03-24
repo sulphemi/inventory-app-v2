@@ -1,3 +1,4 @@
+import { DatabaseError } from "pg";
 import pool from "./pool.js";
 
 function buildBaseQuery(
@@ -212,10 +213,31 @@ WHERE inboundDate <= $1::DATE AND inboundDate IS NOT NULL;
 
 async function getItemInfo(item_id: number) {
     const query = `
-SELECT * FROM items WHERE internal_id = $1
-`;
-    const res = await pool.query(query, [ item_id ]);
-    return res.rows;
+        SELECT 
+            i.*,
+            COALESCE(
+                (
+                    SELECT jsonb_agg(jsonb_build_object(
+                        /* Let Postgres handle the timestamp conversion naturally */
+                        'timestamp', l.log_timestamp, 
+                        'old_values', l.old_values,
+                        'new_values', l.new_values
+                    ) ORDER BY l.log_timestamp DESC)
+                    FROM log l
+                    WHERE l.item_id = i.internal_id
+                ), 
+                '[]'::jsonb
+            ) AS history
+        FROM items i
+        WHERE i.internal_id = $1;
+    `;
+
+    const res = await pool.query(query, [item_id]);
+
+    if (res.rows.length === 0) return null;
+
+    const { history, ...item } = res.rows[0];
+    return { item, history };
 }
 
 export default {

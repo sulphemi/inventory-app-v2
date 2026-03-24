@@ -200,15 +200,16 @@ router.post("/items", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/items/details/:id", async (req: Request, res: Response) => {
+router.get("/items/:id", async (req: Request, res: Response) => {
     const id = +req.params.id;
-    const rows = await Queries.getItemInfo(id);
+    const row = await Queries.getItemInfo(id);
 
-    if (rows.length === 0) {
-        return res.status(404).json({ success: false, itemInfo: null });
-    } 
+    if (row == null) {
+        return res.status(404).json({ success: false, message: "not found" });
+    }
+    const { item, history } = row;
 
-    res.json({ success: true, itemInfo: rows[0] });
+    res.json({ success: true, item, history });
 });
 
 router.put("/items/:id", async (req: Request, res: Response) => {
