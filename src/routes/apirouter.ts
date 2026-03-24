@@ -65,6 +65,128 @@ router.get("/items", async (req: Request, res: Response) => {
     }
 });
 
+router.get("/count", async (req: Request, res: Response) => {
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
+    if (req.query.sortBy) {
+        const columns = (req.query.sortBy as string).split(',');
+        const directions = (req.query.direction as string || "ASC").split(',');
+
+        columns.forEach((col, index) => {
+            sorts.push({
+                column: col.trim(),
+                direction: (directions[index]?.toUpperCase() === "DESC") ? "DESC" : "ASC"
+            });
+        });
+    }
+
+    const filters: { column: string, value: string }[] = [];
+    if (req.query.filterBy) {
+        const filterCols = (req.query.filterBy as string).split(',');
+        const filterVals = (req.query.filterValue as string || "").split(',');
+
+        filterCols.forEach((col, index) => {
+            const val = filterVals[index];
+            if (val !== undefined && val !== "") {
+                filters.push({
+                    column: col.trim(),
+                    value: val.trim()
+                });
+            }
+        });
+    }
+
+    const notNullColumns: string[] = [];
+    if (req.query.notNull) {
+        const cols = (req.query.notNull as string).split(',');
+        cols.forEach(col => {
+            const trimmed = col.trim();
+            if (trimmed) notNullColumns.push(trimmed);
+        });
+    }
+
+    try {
+        const { items, total } = await Queries.getItems(
+            filters,
+            sorts,
+            limit,
+            offset,
+            notNullColumns
+        );
+
+        res.json({ success: true, length: items.length });
+    } catch (error) {
+        res.status(500).json({ success: false, items: null });
+    }
+});
+
+router.get("/export", async (req: Request, res: Response) => {
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
+    if (req.query.sortBy) {
+        const columns = (req.query.sortBy as string).split(',');
+        const directions = (req.query.direction as string || "ASC").split(',');
+
+        columns.forEach((col, index) => {
+            sorts.push({
+                column: col.trim(),
+                direction: (directions[index]?.toUpperCase() === "DESC") ? "DESC" : "ASC"
+            });
+        });
+    }
+
+    const filters: { column: string, value: string }[] = [];
+    if (req.query.filterBy) {
+        const filterCols = (req.query.filterBy as string).split(',');
+        const filterVals = (req.query.filterValue as string || "").split(',');
+
+        filterCols.forEach((col, index) => {
+            const val = filterVals[index];
+            if (val !== undefined && val !== "") {
+                filters.push({
+                    column: col.trim(),
+                    value: val.trim()
+                });
+            }
+        });
+    }
+
+    const notNullColumns: string[] = [];
+    if (req.query.notNull) {
+        const cols = (req.query.notNull as string).split(',');
+        cols.forEach(col => {
+            const trimmed = col.trim();
+            if (trimmed) notNullColumns.push(trimmed);
+        });
+    }
+
+    try {
+        const { items, total } = await Queries.getItems(
+            filters,
+            sorts,
+            limit,
+            offset,
+            notNullColumns
+        );
+
+        const filename = `export-${new Date()}.xlsx`;
+
+        res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+
+        await Excel.create_export(res, items);
+    } catch (error) {
+        res.status(500).json({ success: false, items: null });
+    }
+});
+
 router.post("/items", async (req: Request, res: Response) => {
     try {
         const newItem = await Queries.newItem(
@@ -119,7 +241,7 @@ router.put("/items/:id", async (req: Request, res: Response) => {
 });
 
 router.get("/suggest", async (req: Request, res: Response) => {
-    const suggestions = await Queries.suggestSKU(req.params.partialSKU || "");
+    const suggestions = await Queries.suggestSKU(req.query.partialSKU || "");
     res.json(suggestions);
 });
 
@@ -164,6 +286,7 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
         const data = [];
 
         // collect the data
+        // TODO: should write this as one query instead of looping getItems
         for (const prefix of warehouse.prefixes) {
             const { items } = await Queries.getItems(
                 [ { column: "warehouse_id", value: prefix } ],
