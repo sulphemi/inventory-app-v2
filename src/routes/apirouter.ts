@@ -51,7 +51,7 @@ router.get("/items", async (req: Request, res: Response) => {
     }
 
     try {
-        const { items, total } = await Queries.getItems(
+        const items = await Queries.getItems(
             filters,
             sorts,
             limit,
@@ -108,15 +108,8 @@ router.get("/count", async (req: Request, res: Response) => {
     }
 
     try {
-        const { items, total } = await Queries.getItems(
-            filters,
-            sorts,
-            limit,
-            offset,
-            notNullColumns
-        );
-
-        res.json({ success: true, length: items.length });
+        const count = await Queries.getItemsCount(filters, notNullColumns);
+        res.json({ success: true, length: count });
     } catch (error) {
         res.status(500).json({ success: false, items: null });
     }

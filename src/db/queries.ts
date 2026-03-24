@@ -2,17 +2,8 @@ import pool from "./pool.js";
 
 const NOT_DELETED = "i.deleted_at IS NULL";
 
-/**
- * @brief Get items that conform to the conditions
- * @param filters Array of { column, value } objects
- * @param sort Array of { column, direction } objects
- * @param notNullColumns Array of column names that must not be null
- */
-async function getItems(
-    filters: { column: string, value: string }[] = [], 
-    sort: { column: string, direction: "ASC" | "DESC" }[] = [], 
-    limit: number | null = null, 
-    offset: number = 0,
+function buildBaseQuery(
+    filters: { column: string, value: string }[] = [],
     notNull: string[] = []
 ) {
     let baseQuery = `
@@ -24,10 +15,10 @@ async function getItems(
     const values: any[] = [];
     let paramCount = 1;
 
-    // apply prefix filters
+    // ppply prefix filters
     for (const f of filters) {
         baseQuery += ` AND i.${f.column} ILIKE $${paramCount}`;
-        values.push(`${f.value}%`); 
+        values.push(`${f.value}%`);
         paramCount++;
     }
 
@@ -36,9 +27,24 @@ async function getItems(
         baseQuery += ` AND i.${col} IS NOT NULL`;
     }
 
-    // count parameters used in filtering
-    const filterParamCount = paramCount - 1;
-    const countQuery = `SELECT COUNT(*)::int AS total ${baseQuery}`;
+    return { baseQuery, values, nextParamIndex: paramCount };
+}
+
+/**
+ * @brief Get items that conform to the conditions
+ * @param filters Array of { column, value } objects
+ * @param sort Array of { column, direction } objects
+ * @param notNullColumns Array of column names that must not be null
+ */
+async function getItems(
+    filters: { column: string, value: string }[] = [],
+    sort: { column: string, direction: "ASC" | "DESC" }[] = [],
+    limit: number | null = null,
+    offset: number = 0,
+    notNull: string[] = []
+) {
+    const { baseQuery, values, nextParamIndex } = buildBaseQuery(filters, notNull);
+    let paramCount = nextParamIndex;
 
     let dataQuery = `
         SELECT
@@ -70,15 +76,24 @@ async function getItems(
         paramCount++;
     }
 
+    // TODO: keyset pagination but its not too important
     // apply offset
     dataQuery += ` OFFSET $${paramCount}`;
     values.push(offset);
 
-    const dataRes = await pool.query(dataQuery, values);
+    const res = await pool.query(dataQuery, values);
+    return res.rows;
+}
 
-    return {
-        items: dataRes.rows,
-    };
+// like get items, but only returns the count of how many rows
+async function getItemsCount(
+    filters: { column: string, value: string }[] = [],
+    notNull: string[] = []
+) {
+    const { baseQuery, values } = buildBaseQuery(filters, notNull);
+    const countQuery = `SELECT COUNT(*)::int AS total ${baseQuery}`;
+    const res = await pool.query(countQuery, values);
+    return res.rows[0].total;
 }
 
 /**
@@ -206,6 +221,7 @@ SELECT * FROM items WHERE internal_id = $1
 
 export default {
     getItems,
+    getItemsCount,
     getAllConditions,
     newItem,
     editItem,
