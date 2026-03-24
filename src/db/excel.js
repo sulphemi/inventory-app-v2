@@ -1,5 +1,86 @@
 import ExcelJS from "exceljs";
 
+async function create_export(stream, data) {
+    // setup workbook
+    const workbook = new ExcelJS.Workbook();
+    workbook.calcProperties.fullCalcOnLoad = true;
+
+    const worksheet = workbook.addWorksheet("inventory");
+
+    // this should really be from a single source of truth...
+    worksheet.columns = [
+        { header: "序号", key: "warehouse_id", width: 10 },     // A
+        { header: "SKU", key: "sku", width: 20 },               // B
+        { header: "尺寸", key: "size", width: 10 },             // C
+        { header: "备注", key: "notes", width: 10 },            // D
+        { header: "数量", key: "quantity", width: 10 },         // E
+        { header: "状况", key: "condition", width: 20 },        // F
+        { header: "入仓日期", key: "inbounddate", width: 20 },  // G
+        { header: "出仓日期", key: "outbounddate", width: 20 }, // H
+        { header: "处理", key: "status", width: 20 },           // I
+    ];
+
+    for (const row of data) {
+        const excelRow = { ...row };
+
+        // for some columns, convert string to better datatype
+        excelRow.inbounddate = excelRow.inbounddate ? new Date(excelRow.inbounddate) : null;
+        excelRow.outbounddate = excelRow.outbounddate ? new Date(excelRow.outbounddate) : null;
+        excelRow.quantity = +excelRow.quantity;
+
+        worksheet.addRow(excelRow);
+    }
+
+    // conditional formatting styles
+    const GRAY_BG = {
+        fill: { type: "pattern", pattern: "solid", bgColor: { argb: "FF6F6F7A" } },
+        // border: {
+        //     top: { style: "thin" },
+        //     left: { style: "thin" },
+        //     bottom: { style: "thin" },
+        //     right: { style: "thin" },
+        // }
+    };
+
+    const YELLOW_BG = {
+        fill: { type: "pattern", pattern: "solid", bgColor: { argb: "FFFFFF00" } },
+        // border: {
+        //     top: { style: "thin" },
+        //     left: { style: "thin" },
+        //     bottom: { style: "thin" },
+        //     right: { style: "thin" },
+        // }
+    };
+
+    // apply conditional formatting
+    worksheet.addConditionalFormatting({
+        ref: `A2:I${data.length + 1}`,
+        rules: [
+            {
+                type: "expression",
+                formulae: [ '=OR($I2="报废", $I2="弃置")' ],
+                style: GRAY_BG,
+            }
+        ],
+    });
+
+    worksheet.addConditionalFormatting({
+        ref: `A2:I${data.length + 1}`,
+        rules: [
+            {
+                type: "expression",
+                formulae: [ "=$H2>$G2" ],
+                style: YELLOW_BG,
+            }
+        ],
+    });
+
+    // send off the workbook
+    await workbook.xlsx.write(stream);
+    stream.end();
+
+}
+
 async function monthly_summary(stream, data, enddate) {
     // setup workbook
     const workbook = new ExcelJS.Workbook();
@@ -116,5 +197,6 @@ async function monthly_summary(stream, data, enddate) {
 }
 
 export default {
+    create_export,
     monthly_summary,
 };
