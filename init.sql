@@ -9,7 +9,7 @@ CREATE TABLE item_conditions (
 
 CREATE TABLE items (
   internal_id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  warehouse_id TEXT,
+  warehouse_id INTEGER UNIQUE NOT NULL,
   sku TEXT,
   size TEXT,
   notes TEXT,
@@ -25,7 +25,7 @@ CREATE TABLE items (
 CREATE TABLE log (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   item_id INTEGER REFERENCES items(internal_id) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  log_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   old_values JSONB,
   new_values JSONB
 );
