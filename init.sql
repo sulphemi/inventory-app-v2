@@ -19,7 +19,6 @@ CREATE TABLE items (
   outboundDate DATE,
   addendum TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP
 );
 
 CREATE TABLE log (

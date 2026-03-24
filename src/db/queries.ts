@@ -1,21 +1,20 @@
 import pool from "./pool.js";
 
-const NOT_DELETED = "i.deleted_at IS NULL";
-
 function buildBaseQuery(
     filters: { column: string, value: string }[] = [],
     notNull: string[] = []
 ) {
+    // WHERE 1=1 so it works without any filters
     let baseQuery = `
         FROM items AS i
         JOIN item_conditions AS ic ON i.condition_id = ic.id
-        WHERE i.deleted_at IS NULL
+        WHERE 1=1
     `;
 
     const values: any[] = [];
     let paramCount = 1;
 
-    // ppply prefix filters
+    // apply prefix filters
     for (const f of filters) {
         baseQuery += ` AND i.${f.column} ILIKE $${paramCount}`;
         values.push(`${f.value}%`);
@@ -168,11 +167,11 @@ LEFT JOIN item_conditions ic ON i.condition_id = ic.id
 }
 
 /**
- * @brief Performs a soft delete on an item by setting its deleted_at timestamp
+ * @brief Deletes an item from the database
  * @param internal_id Primary key of the item to delete
  */
 async function deleteItem(internal_id: number) {
-    await pool.query(`UPDATE items SET deleted_at = NOW() WHERE internal_id = $1`, [ internal_id ]);
+    await pool.query(`DELETE FROM items WHERE internal_id = $1`, [ internal_id ]);
 }
 
 /**
@@ -181,13 +180,13 @@ async function deleteItem(internal_id: number) {
  * @return Array of unique SKU strings { sku: string }[]
  */
 async function suggestSKU(partialSKU: string, limit: number | null = null) {
-    const query = `SELECT DISTINCT sku FROM items i WHERE sku LIKE $1 || '%' AND ${NOT_DELETED} LIMIT ${limit}`;
+    const query = `SELECT DISTINCT sku FROM items i WHERE sku LIKE $1 || '%' LIMIT ${limit}`;
     const { rows } = await pool.query(query, [ partialSKU ]);
     return rows;
 }
 
 /**
- * @brief Calculates total holding days for active items up to a specific date
+ * @brief Calculates total holding days for items up to a specific date
  * @param endDate The target date for the calculation
  * @return The sum of days items have been in inventory
  *
@@ -205,7 +204,7 @@ SELECT
         END
     ), 0)::INTEGER AS total_days
 FROM items
-WHERE inboundDate <= $1::DATE AND deleted_at IS NULL AND inboundDate IS NOT NULL;
+WHERE inboundDate <= $1::DATE AND inboundDate IS NOT NULL;
 `;
     const res = await pool.query(query, [ endDate ]);
     return res.rows[0].total_days;
