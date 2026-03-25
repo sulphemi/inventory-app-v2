@@ -225,7 +225,6 @@ router.put("/items/:id", async (req: Request, res: Response) => {
             req.body.condition_id || null,
             req.body.inbounddate || null,
             req.body.outbounddate || null,
-            req.body.status_id || null,
             req.body.addendum || null,
         );
         res.json({ success: true });
