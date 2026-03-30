@@ -2,6 +2,8 @@ CREATE DATABASE ng_inventory;
 
 \c ng_inventory;
 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 CREATE TABLE item_conditions (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
   condition TEXT UNIQUE NOT NULL
@@ -18,8 +20,13 @@ CREATE TABLE items (
   inboundDate DATE,
   outboundDate DATE,
   addendum TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Removed trailing comma for valid syntax
 );
+
+CREATE INDEX idx_items_condition_id ON items(condition_id); 
+CREATE INDEX idx_items_inbound_date ON items(inboundDate);
+CREATE INDEX idx_items_outbound_date ON items(outboundDate);
+CREATE INDEX idx_items_sku_trgm ON items USING gin (sku gin_trgm_ops);
 
 CREATE TABLE log (
   id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -28,6 +35,8 @@ CREATE TABLE log (
   old_values JSONB,
   new_values JSONB
 );
+
+CREATE INDEX idx_log_item_id_timestamp ON log(item_id, log_timestamp DESC);
 
 CREATE FUNCTION log_item_diff()
 RETURNS TRIGGER AS $$
