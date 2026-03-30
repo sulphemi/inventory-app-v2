@@ -2,6 +2,7 @@ import { PassThrough } from "stream";
 import { Request, Response, Router } from "express";
 import archiver from "archiver";
 import Queries from "../db/queries.js";
+// @ts-ignore
 import Excel from "../db/excel.js";
 
 const apirouter = Router();
@@ -9,8 +10,8 @@ const apirouter = Router();
 const router = apirouter;
 
 router.get("/items", async (req: Request, res: Response) => {
-    const offset = req.query.offset;
-    const limit = req.query.limit;
+    const offset = parseInt(req.query.offset as string) || 0;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
 
     const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
     if (req.query.sortBy) {
@@ -116,8 +117,8 @@ router.get("/count", async (req: Request, res: Response) => {
 });
 
 router.get("/export", async (req: Request, res: Response) => {
-    const offset = req.query.offset;
-    const limit = req.query.limit;
+    const offset = parseInt(req.query.offset as string) || 0;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
 
     const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
     if (req.query.sortBy) {
@@ -158,7 +159,7 @@ router.get("/export", async (req: Request, res: Response) => {
     }
 
     try {
-        const { items, total } = await Queries.getItems(
+        const items = await Queries.getItems(
             filters,
             sorts,
             limit,
@@ -191,7 +192,6 @@ router.post("/items", async (req: Request, res: Response) => {
             req.body.condition_id || null,
             req.body.inbounddate || null,
             req.body.outbounddate || null,
-            req.body.status_id || null,
             req.body.addendum || null,
         );
         res.status(201).json({ success: true, newItem });
@@ -234,7 +234,7 @@ router.put("/items/:id", async (req: Request, res: Response) => {
 });
 
 router.get("/suggest", async (req: Request, res: Response) => {
-    const suggestions = await Queries.suggestSKU(req.query.partialSKU || "");
+    const suggestions = await Queries.suggestSKU((req.query.partialSKU as string) || "");
     res.json(suggestions);
 });
 
@@ -254,7 +254,7 @@ router.get("/conditions", async (req: Request, res: Response) => {
 });
 
 router.get("/monthly_summary", async (req: Request, res: Response) => {
-    const enddate = req.query.date.replaceAll("-", "/");
+    const enddate = (req.query.date as string || "").replaceAll("-", "/");
 
     // temporary solution, should probably store this in the db
     const warehouses = [
@@ -281,7 +281,7 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
         // collect the data
         // TODO: should write this as one query instead of looping getItems
         for (const prefix of warehouse.prefixes) {
-            const { items } = await Queries.getItems(
+            const items = await Queries.getItems(
                 [ { column: "warehouse_id", value: prefix } ],
                 [], null, 0, []
             );
