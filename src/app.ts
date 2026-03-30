@@ -8,6 +8,7 @@ import router from "./routes/router.js";
 import apirouter from "./routes/apirouter.js";
 
 const DIRNAME = import.meta.dirname;
+const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 8000;
 const STATIC_PATH = path.join(DIRNAME, "public");
 
@@ -42,6 +43,6 @@ app.use(authGuard);
 app.use("/api", apirouter);
 app.use("/", router);
 
-app.listen(PORT, () => {
+app.listen(PORT, HOST, () => {
     console.log(`Server listening on port ${PORT}`);
 });
