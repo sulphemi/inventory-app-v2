@@ -9,7 +9,7 @@ import apirouter from "./routes/apirouter.js";
 
 const DIRNAME = import.meta.dirname;
 const HOST = process.env.HOST || "localhost";
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT) || 8000;
 const STATIC_PATH = path.join(DIRNAME, "public");
 
 const AUTH_SECRET = process.env.NG_AUTH_SECRET;
