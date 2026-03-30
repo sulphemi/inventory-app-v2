@@ -81,7 +81,7 @@ async function create_export(stream, data) {
 
 }
 
-async function monthly_summary(stream, data, enddate) {
+async function monthly_summary(stream, data, enddate, rate) {
     // setup workbook
     const workbook = new ExcelJS.Workbook();
     workbook.calcProperties.fullCalcOnLoad = true;
@@ -100,9 +100,12 @@ async function monthly_summary(stream, data, enddate) {
         { header: "出仓日期", key: "outbounddate", width: 20 }, // H
         { header: "处理", key: "status", width: 20 },           // I
         { header: "天数", key: "daycount", width: 10 },         // J
+        { header: "率", key: "rate", width: 10 },               // K
+        { header: "x", key: "multiply", width: 10},             // L
     ];
 
     for (const row of data) {
+        // inherit the columns from the database
         const excelRow = { ...row };
 
         // for some columns, convert string to better datatype
@@ -110,17 +113,20 @@ async function monthly_summary(stream, data, enddate) {
         excelRow.outbounddate = excelRow.outbounddate ? new Date(excelRow.outbounddate) : null;
         excelRow.quantity = +excelRow.quantity;
 
+        // non-formula columns that aren't native to the row we got
+        excelRow.rate = excelRow.status === "二次销售" ? rate : 0;
+
         worksheet.addRow(excelRow);
     }
 
     // put the enddate in the cell
-    worksheet.getCell("L1").value = "Reference Date";
-    worksheet.getCell("L2").value = enddate;
+    worksheet.getCell("N1").value = "结束日期";
+    worksheet.getCell("N2").value = enddate;
 
     // apply daycount
     // first set master cell to first row, and slave cells all the way down
     worksheet.getCell("J2").value = {
-        formula: '=IF(AND(G2<=$L$2, G2<>""), IF(EOMONTH(G2,0)=EOMONTH($L$2,0), $L$2-G2, DAY($L$2)), 0)',
+        formula: '=IF(AND(G2<=$N$2, G2<>"", $I2="二次销售"), IF(EOMONTH(G2,0)=EOMONTH($N$2,0), DAY(G2), DAY($N$2)), 0)',
         shareType: "shared",
         ref: `J2:J${data.length + 1}`,
     };
@@ -130,21 +136,24 @@ async function monthly_summary(stream, data, enddate) {
         worksheet.getCell(`J${index + 2}`).value = { sharedFormula: "J2" };
     }
 
+    // apply multiplying
+    worksheet.getCell("L2").value = {
+        formula: '=$J2*$K2',
+        shareType: "shared",
+        ref: `L2:L${data.length + 1}`,
+    }
+
+    // cascading it down
+    for (let index = 1; index < data.length; index++) {
+        worksheet.getCell(`L${index + 2}`).value = { sharedFormula: "L2" };
+    }
+
     // add summary lines to the bottom of the table
     // these column names don't mean anything, they're just to position
     // TODO: stop using data.length ffs
-    const RATE = 69420;
     worksheet.addRow({
-        status: "Total Days",
-        daycount: { formula: `=SUM(J2:J${data.length + 1})` },
-    });
-    worksheet.addRow({
-        status: "Rate",
-        daycount: RATE,
-    });
-    worksheet.addRow({
-        status: "Charge",
-        daycount: { formula: `=J${data.length + 2}*J${data.length + 3}` },
+        rate: "Total",
+        multiply: { formula: `=SUM(L2:L${data.length + 1})` },
     });
 
     // conditional formatting styles
@@ -170,7 +179,7 @@ async function monthly_summary(stream, data, enddate) {
 
     // apply conditional formatting
     worksheet.addConditionalFormatting({
-        ref: `A2:J${data.length + 1}`,
+        ref: `A2:L${data.length + 1}`,
         rules: [
             {
                 type: "expression",
@@ -181,7 +190,7 @@ async function monthly_summary(stream, data, enddate) {
     });
 
     worksheet.addConditionalFormatting({
-        ref: `A2:J${data.length + 1}`,
+        ref: `A2:L${data.length + 1}`,
         rules: [
             {
                 type: "expression",
