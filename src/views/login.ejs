@@ -1,0 +1,12 @@
+<%- include("partials/header") %>
+
+<%- include("partials/middler") %>
+
+<p>you are not logged in</p>
+<form action="/auth/login" method="POST">
+    <label>auth token</label>
+    <input name="secret" type="password" />
+    <button>submit</button>
+</form>
+
+<%- include("partials/footer") %>
