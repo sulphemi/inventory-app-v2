@@ -18,7 +18,7 @@ function buildBaseQuery(
 
     // apply prefix filters
     for (const f of filters) {
-        baseQuery += ` AND i.${f.column} ILIKE $${paramCount}`;
+        baseQuery += ` AND i.${f.column}::text ILIKE $${paramCount}`;
         values.push(`${f.value}%`);
         paramCount++;
     }
