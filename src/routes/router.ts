@@ -7,7 +7,7 @@ const FRONTEND_PATH = process.env.FRONTEND_PATH || path.join(process.cwd(), "fro
 
 router.use(express.static(FRONTEND_PATH));
 
-router.get("*", (req: Request, res: Response) => {
+router.get(/.*/, (req: Request, res: Response) => {
     res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
