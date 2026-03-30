@@ -2,7 +2,7 @@ import { PassThrough } from "stream";
 import { Request, Response, Router } from "express";
 import archiver from "archiver";
 import Queries from "../db/queries.js";
-// @ts-ignore
+import { QueryFilter, QuerySort } from "../types.js";
 import Excel from "../db/excel.js";
 
 const apirouter = Router();
@@ -13,7 +13,7 @@ router.get("/items", async (req: Request, res: Response) => {
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
 
-    const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
+    const sorts: QuerySort[] = [];
     if (req.query.sortBy) {
         const columns = (req.query.sortBy as string).split(',');
         const directions = (req.query.direction as string || "ASC").split(',');
@@ -26,7 +26,7 @@ router.get("/items", async (req: Request, res: Response) => {
         });
     }
 
-    const filters: { column: string, value: string }[] = [];
+    const filters: QueryFilter[] = [];
     if (req.query.filterBy) {
         const filterCols = (req.query.filterBy as string).split(',');
         const filterVals = (req.query.filterValue as string || "").split(',');
@@ -70,7 +70,7 @@ router.get("/count", async (req: Request, res: Response) => {
     const offset = req.query.offset;
     const limit = req.query.limit;
 
-    const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
+    const sorts: QuerySort[] = [];
     if (req.query.sortBy) {
         const columns = (req.query.sortBy as string).split(',');
         const directions = (req.query.direction as string || "ASC").split(',');
@@ -83,7 +83,7 @@ router.get("/count", async (req: Request, res: Response) => {
         });
     }
 
-    const filters: { column: string, value: string }[] = [];
+    const filters: QueryFilter[] = [];
     if (req.query.filterBy) {
         const filterCols = (req.query.filterBy as string).split(',');
         const filterVals = (req.query.filterValue as string || "").split(',');
@@ -120,7 +120,7 @@ router.get("/export", async (req: Request, res: Response) => {
     const offset = parseInt(req.query.offset as string) || 0;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : null;
 
-    const sorts: { column: string, direction: "ASC" | "DESC" }[] = [];
+    const sorts: QuerySort[] = [];
     if (req.query.sortBy) {
         const columns = (req.query.sortBy as string).split(',');
         const directions = (req.query.direction as string || "ASC").split(',');
@@ -133,7 +133,7 @@ router.get("/export", async (req: Request, res: Response) => {
         });
     }
 
-    const filters: { column: string, value: string }[] = [];
+    const filters: QueryFilter[] = [];
     if (req.query.filterBy) {
         const filterCols = (req.query.filterBy as string).split(',');
         const filterVals = (req.query.filterValue as string || "").split(',');
@@ -258,12 +258,12 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
 
     // temporary solution, should probably store this in the db
     const warehouses = [
-        { name: "A", prefixes: [ "23", "15", "16", "17", "18", "19" ] },
-        { name: "B", prefixes: [ "24", "25", "26", "27", "28", "29", "55" ]},
-        { name: "C", prefixes: [ "35", "36", "37", "38", "39" ] },
-        { name: "D", prefixes: [ "50", "51", "56", "57", "58" ] },
-        { name: "E", prefixes: [ "45", "46", "47", "48", "49" ] },
-        { name: "F", prefixes: [ "66", "67", "68", "69" ] },
+        { name: "A", prefixes: ["23", "15", "16", "17", "18", "19"] },
+        { name: "B", prefixes: ["24", "25", "26", "27", "28", "29", "55"] },
+        { name: "C", prefixes: ["35", "36", "37", "38", "39"] },
+        { name: "D", prefixes: ["50", "51", "56", "57", "58"] },
+        { name: "E", prefixes: ["45", "46", "47", "48", "49"] },
+        { name: "F", prefixes: ["66", "67", "68", "69"] },
     ];
 
     // set proper headers
@@ -282,7 +282,7 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
         // TODO: should write this as one query instead of looping getItems
         for (const prefix of warehouse.prefixes) {
             const items = await Queries.getItems(
-                [ { column: "warehouse_id", value: prefix } ],
+                [{ column: "warehouse_id", value: prefix }],
                 [], null, 0, []
             );
             data.push(...items);

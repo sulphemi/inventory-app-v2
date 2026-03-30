@@ -1,8 +1,9 @@
 import { DatabaseError } from "pg";
 import pool from "./pool.js";
+import { QueryFilter, QuerySort } from "../types.js";
 
 function buildBaseQuery(
-    filters: { column: string, value: string }[] = [],
+    filters: QueryFilter[] = [],
     notNull: string[] = []
 ) {
     // WHERE 1=1 so it works without any filters
@@ -37,8 +38,8 @@ function buildBaseQuery(
  * @param notNullColumns Array of column names that must not be null
  */
 async function getItems(
-    filters: { column: string, value: string }[] = [],
-    sort: { column: string, direction: "ASC" | "DESC" }[] = [],
+    filters: QueryFilter[] = [],
+    sort: QuerySort[] = [],
     limit: number | null = null,
     offset: number = 0,
     notNull: string[] = []
@@ -87,7 +88,7 @@ async function getItems(
 
 // like get items, but only returns the count of how many rows
 async function getItemsCount(
-    filters: { column: string, value: string }[] = [],
+    filters: QueryFilter[] = [],
     notNull: string[] = []
 ) {
     const { baseQuery, values } = buildBaseQuery(filters, notNull);
