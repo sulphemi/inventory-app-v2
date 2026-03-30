@@ -255,7 +255,7 @@ router.get("/conditions", async (req: Request, res: Response) => {
 
 router.get("/monthly_summary", async (req: Request, res: Response) => {
     const enddate = (req.query.date as string || "").replaceAll("-", "/");
-    const rate = +req.query.rate;
+    const rate = req.query.rate as string || "0.5";
 
     // temporary solution, should probably store this in the db
     const warehouses = [
