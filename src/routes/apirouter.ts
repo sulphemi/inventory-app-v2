@@ -234,7 +234,7 @@ router.put("/items/:id", async (req: Request, res: Response) => {
 });
 
 router.get("/suggest", async (req: Request, res: Response) => {
-    const suggestions = await Queries.suggestSKU((req.query.partialSKU as string) || "", 20);
+    const suggestions = await Queries.suggestSKU((req.query.partialSKU as string) || "", 100);
     res.json(suggestions);
 });
 
