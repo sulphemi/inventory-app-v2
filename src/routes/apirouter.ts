@@ -234,7 +234,7 @@ router.put("/items/:id", async (req: Request, res: Response) => {
 });
 
 router.get("/suggest", async (req: Request, res: Response) => {
-    const suggestions = await Queries.suggestSKU((req.query.partialSKU as string) || "");
+    const suggestions = await Queries.suggestSKU((req.query.partialSKU as string) || "", 20);
     res.json(suggestions);
 });
 
@@ -255,6 +255,7 @@ router.get("/conditions", async (req: Request, res: Response) => {
 
 router.get("/monthly_summary", async (req: Request, res: Response) => {
     const enddate = (req.query.date as string || "").replaceAll("-", "/");
+    const rate = +req.query.rate;
 
     // temporary solution, should probably store this in the db
     const warehouses = [
@@ -281,10 +282,7 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
         // collect the data
         // TODO: should write this as one query instead of looping getItems
         for (const prefix of warehouse.prefixes) {
-            const items = await Queries.getItems(
-                [{ column: "warehouse_id", value: prefix }],
-                [], null, 0, []
-            );
+            const items = await Queries.getItems([{ column: "warehouse_id", value: prefix }]);
             data.push(...items);
         }
 
@@ -295,7 +293,7 @@ router.get("/monthly_summary", async (req: Request, res: Response) => {
         archive.append(workbook_stream, { name: filename });
 
         // create the workbook and write it into the stream
-        await Excel.monthly_summary(workbook_stream, data, enddate);
+        await Excel.monthly_summary(workbook_stream, data, enddate, rate);
     }
 
     await archive.finalize();
