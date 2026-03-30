@@ -20,8 +20,8 @@ app.use(express.json());
 app.set("views", path.join(DIRNAME, "views"));
 app.set("view engine", "ejs");
 
-app.use("/", router);
 app.use("/api", apirouter);
+app.use("/", router);
 
 app.listen(PORT, (err) => {
     if (err) throw err;
