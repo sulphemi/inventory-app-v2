@@ -11,7 +11,7 @@ CREATE TABLE item_conditions (
 
 CREATE TABLE items (
   internal_id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  warehouse_id INTEGER UNIQUE NOT NULL,
+  warehouse_id INTEGER NOT NULL,
   sku TEXT,
   size TEXT,
   notes TEXT,
@@ -20,7 +20,8 @@ CREATE TABLE items (
   inboundDate DATE,
   outboundDate DATE,
   addendum TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Removed trailing comma for valid syntax
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  duplicate_id INTEGER
 );
 
 CREATE INDEX idx_items_condition_id ON items(condition_id); 
