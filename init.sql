@@ -11,7 +11,7 @@ CREATE TABLE item_conditions (
 
 CREATE TABLE items (
   internal_id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  warehouse_id INTEGER NOT NULL,
+  warehouse_id BIGINT NOT NULL,
   sku TEXT,
   size TEXT,
   notes TEXT,
