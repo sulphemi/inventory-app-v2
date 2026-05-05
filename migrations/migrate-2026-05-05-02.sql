@@ -1,0 +1,8 @@
+BEGIN;
+
+ALTER TABLE items DROP CONSTRAINT IF EXISTS items_warehouse_id_key;
+ALTER TABLE items ALTER COLUMN warehouse_id TYPE BIGINT;
+ALTER TABLE items ADD COLUMN duplicate_id INTEGER;
+
+INSERT INTO migrations (name) VALUES ('2026-05-05-02');
+COMMIT;
