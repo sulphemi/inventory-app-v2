@@ -74,3 +74,7 @@ AFTER UPDATE ON items
 FOR EACH ROW
 EXECUTE FUNCTION log_item_diff();
 
+CREATE TABLE migrations (
+    name TEXT PRIMARY KEY,
+    migrated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
